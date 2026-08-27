@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Transient build artifacts — the canonical published copies live in docs/
+/recall_monitor_mobile.html
+/dashboard.html
+
+# Local Excel build (regenerate with: python build_workbook.py)
+/Food_Recall_Tracker.xlsx

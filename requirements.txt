@@ -1,0 +1,10 @@
+# US Food Recall Monitor — Python dependencies
+#
+# The FETCHER and the DASHBOARD/MOBILE builders:
+curl_cffi>=0.7        # USDA fetch: presents a browser TLS fingerprint to get
+                      # past FSIS bot protection (FDA works without it)
+pillow>=10.0          # generates the phone home-screen icon (optional)
+#
+# Only needed to build the Excel workbook locally (build_workbook.py):
+openpyxl>=3.1
+pandas>=2.0
