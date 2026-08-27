@@ -89,12 +89,11 @@ several years accumulates history. See
 - **Automate it:** [`guides/AUTOMATE_DAILY.md`](guides/AUTOMATE_DAILY.md) — the
   included workflow fetches, rebuilds `docs/`, and commits once a day.
 
-One caveat worth reading before you rely on the daily job: the phone app already
-fetches **FDA live on every open**, so automation mainly keeps the embedded
-**USDA** snapshot current — and USDA may be blocked from GitHub's cloud servers
-even though it works from your home machine. The job degrades gracefully (FDA
-keeps updating; USDA holds at its last good value). Details and a home-PC
-alternative are in the automation guide.
+The phone app already fetches **FDA live on every open**, so automation mainly 
+keeps the embedded **USDA** snapshot current — and USDA may be blocked from 
+GitHub's cloud servers even though it works from your home machine. 
+The job degrades gracefully (FDA keeps updating; USDA holds at its 
+last good value). Details and a home-PC alternative are in the automation guide.
 
 ## Data sources
 
@@ -119,6 +118,4 @@ alternative are in the automation guide.
 
 ## License
 
-Code is released under the MIT License (see [`LICENSE`](LICENSE)) — replace
-`<Your Name>` with yours, or swap in a different license. The underlying recall
-data is public U.S. government information. This note is not legal advice.
+Code is released under the MIT License (see [`LICENSE`](LICENSE)).
