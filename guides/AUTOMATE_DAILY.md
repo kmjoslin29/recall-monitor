@@ -1,5 +1,14 @@
 # Auto-update once a day (GitHub Actions)
 
+>
+> **Update:** it's now confirmed that USDA can't be fetched from GitHub's cloud
+> runners (they're IP-blocked). The daily workflow therefore runs on a
+> **self-hosted runner** — see [`SELF_HOSTED_RUNNER.md`](SELF_HOSTED_RUNNER.md)
+> for the setup. The **Task Scheduler / `.bat`** section below is still valid as
+> the backup method, and the honest picture below still explains *why*.
+>
+
+
 This repo already includes the workflow — `.github/workflows/update-recalls.yml`.
 Once a day it fetches fresh recalls, rebuilds the site into `docs/`, and commits,
 which makes GitHub Pages redeploy. No computer needed.
