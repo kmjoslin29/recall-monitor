@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Recall Monitor</title>
+<meta name="theme-color" content="#16202A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Recalls">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAYAAAD0eNT6AAAXl0lEQVR4nO3dPXbkxtkGUEhnMsfWpJpUsxfnWoBX5QU4916kVEolx850jr6AX4tkk81GAyjU+3NvokRDAoUCnqcKTfKbhZC++/6HP2cfA8BRfv/1529mHwOvuSCTCHiAZwrC+Qz4CYQ9wOOUgrEM7gACH+B4CsGxDOYBBD7A+RSCfQzeRkIfIA5l4HEG7AFCHyA+ZWAdg3SH0AfISxm4zcDcIPgB6lAE3jIgLwh9gPqUgScGYRH8AB11LwKtT17wA9C1CLQ8acEPwLVuRaDVyQp+AO7pUgRanKTgB+BR1YvAt7MPYDThD8AW1fOjbLupfuEAOE/F3YByJyT4ARilUhEo9QpA+AMwUqWcKdFkKl0QAHLIvhuQfgdA+AMwQ/b8SV0Asg8+ALllzqGU2xeZBxyAmrK9Eki3AyD8AYgoWz6lKgDZBheAXjLlVIrtikwDCgDLEv+VQPgdAOEPQEbR8yt0AYg+eADwkcg5FrYARB40AFgrap6FLABRBwsAtoiYa+EKQMRBAoC9ouVbqAIQbXAA4EiRci5MAYg0KAAwSpS8C1EAogwGAJwhQu5NLwARBgEAzjY7/6YWgNknDwAzzczBaQVA+APAvDycUgCEPwA8m5GLpxcA4Q8Ab52dj6cWAOEPALedmZOnFQDhDwD3nZWXpxQA4Q8A652Rm9N/DwAAcL7hBcDqHwAeNzo/hxYA4Q8A243M0WEFQPgDwH6j8tRnAACgoSEFwOofAI4zIlcPLwDCHwCOd3S+HloAhD8AjHNkzvoMAAA0dFgBsPoHgPGOyttDCoDwB4DzHJG7XgEAQEO7C4DVPwCcb2/+2gEAgIZ2FQCrfwCYZ08Oby4Awh8A5tuax14BAEBDmwqA1T8AxLEllz+NOBCe/efv/9v8b//x378deCQA8OybR/+B1f99e0L/FmUAgHt+//Xn1bluB+AgI0L/1tdXBgDY66HPAFj9v290+M/+fgDk8EhO2wHYYWYQX7633QAAtli9A2D1/1qUVXiU4wAghrV57fcAbBAtdKMdDwDxrSoAVv/PooZt1OMC4HxrctsOwAOih2z04wMgDgVgpSzhmuU4AZjrbgGw/Q8A+dzLbzsAK2RbVWc7XgDO92EBsPrPG6ZZjxuA43yU43YAAKAhBQAAGrpZAGz/599Gz378AOx3K8/tAABAQwoAADT0bgGw/V9n+7zKeQCw3Xu5bgcAABpSAACgoTcFwPY/ANRzne92AACgIQUAABpSAACgoVcFwPt/AKjrZc7bAQCAhhQAAGhIAQCAhv4qAN7/A0B9l7y3AwAADSkAANCQAgAADSkAANDQt8viA4AA0Ml33//wpx0AAGhIAQCAhhQAAGhIAQCAhhQAAGhIAQCAhhQAAGjoW78DAAD6sQMAAA0pAADQkAIAAA0pAADQkAIAAA0pAADQkAIAAA0pAADQkAIAAA19mn0AAL/98tPhX/Pzl6+Hf02oRAEAhhsR8Hu/p4JAdwoAcJgZQb/VrWNVDOhCAQA2yxT4a12fk0JAVQoAsFrFwL9HIaAqBQD4UMfQ/8jL8VAGyEwBAN4Q+usoA2SmAADLsgj9vZQBslEAoDGhP4YyQAYKADQk+M9zGWtFgGgUAGhC6M9lV4BoFAAoTvDHY1eACBQAKErwx6cIMJMCAMUI/nwUAWZQAKAIwZ+fIsCZvp19AMB+wr8W15Mz2AGAxARFXXYDGE0BgIQEfx+KAKMoAJCI4O9LEeBoPgMASQh/lsU84Dh2ACA4D3yu2Q3gCHYAIDDhz0fMD/ZQACAoD3fWME/YyisACMYDnUd5JcAWdgAgEOHPHuYPj1AAIAgPb45gHrGWVwAwmQc2R/NKgDXsAMBEwp+RzC8+ogDAJB7OnME84xYFACbwUOZM5hvvUQDgZB7GzGDecc2HAOEkHsDM5sOBvGQHAE4g/InEfGRZFAAYzsOWiMxLvAKAgTxk1ztyW9q4r/PbLz95HdCYAgCDCKG3zgqbj76P6/KaEtCXAgADCJknEYPl+phcKyWgKwUADtY5UDKGiELwRAnoRwGAA3UMj2qh8fJ8ul1PJaAXBQAO0iksuoRExzKgBPShAACrdQ6Gy7l3KQLUpwDAASqHQufQf0+HXQG7AD34RUCwU9UQ+PzlqxC4o/IYVZ3XPFMAYIeKD8nKoTZK1TGrOL95pgDARtUejlVD7EwVx7DaPOeZAgAbVHooVgyt2aqNaaX5zjMFABqrFFIRGV8iUwDgQRVWQ9VWqJFVGesK857XFAB4QPaHYJUwyqjC2Gef/7ymAMBK2R9+2cOniuzXIft9wDMFABrIHjrVuB5EoADACllXPRW2navKfG2y3g+8pgDAHVkfdlnDpZus1ynrfcEzBQA+kPUhlzVUusp6vbLeHzzxx4CgkKxBgr82yPnsAMAN2R7Ewr+GbNcx233CMwUA3pHtoZYtNPhYtuuZ7X7hiQIAyWULC9ZxXRlNAYArmVYzQqK2TNc3033DEwUAksoUDmznOjOKAgAvZFnFCIVeslzvLPcPTxQASCZLGHAs152jKQDw/zKsXoRAbxmuf4b7iCcKACw5HloZHv6Ml2EeZLifUAAghQwPfc5jPnAEBYD2rFbgeO6r+BQACM5qj/eYF+ylANBa9FWKh3wtf/z4z0O/XvT5Ef3+6k4BgKCiP9x5zCX8u5UA4lIAaMvqhLNch/7RJSAy91lcCgAEZFVX3x8//vOwImC+sIUCQEuRVyUe5rXcC/kOJSDy/daZAgCBRH6I87i14d6hBBCPAgAwwKOh3ulzAcSgANBO1O1Iq7c6tob5ESUg6jyKet91pgAAHGhviB/54UD4iAJAK1FXIVFXbcyzpwREnU9R77+uFACYLOrDmscdvXKvWAKIQwEAOMCobXuvAxhFAaCNiNuPVmk1jA7prZ8LiDi/It6HXSkAADucuUK3G8CRFACYJOLqjMfMCORHv6d5xi0KAC3YdqSS7DsB7scYFACYwKosv9kh/Mj3N994jwIA8KDZ4X/hlwaxhwJAedG2G63GcosYuGuOKdq8i3ZfdqQAAKwUMfwvIh8bMSkAAAV8+ve/Zh8CySgAlBZtmzHaNizrRV5hrw3/aPMv2v3ZjQIAcEfk8IetFAA4SbTVF+tED/9Ht/7NQy4UAIAbqoU/vKQAUJb3i+wh/M/hPp1HAYAT2HblSHvD33xkWRQAgDcir/6rrPyZTwEAeCFy+MORFABKivRe0XZrHtHD/8jVf6R5Gel+7UQBAFh6hT8siwIAEJ7wZwQFAGgv8upf+DOKAgADRXrPyvs6h7/52ZsCALQVOfxhNAWAcnyimDWih3+3rX/37fkUAKAd4Q8KAAzj/SpbnB3+5mlfCgDQSuTVv5U/Z1IAgDYihz+cTQEAWoge/lb/nE0BAMoT/vCWAgCUJvzhfQoApfhZYjIR/q+5f8+lAMAAfrQqhsir/0jhb772pAAAJUUOf4hAAQDKiR7+kVb/9KUAAKUIf1hHAQA4ifAnEgUAWJYl/sp5jcjnIPyJRgEA/grOyAF6T+ZjhxkUAGjuOjgzBmn0Y7b6JyIFABq7FZzRA/Wl6Mcq/IlKAYCm7gVn9GBdlvjHKPyJTAGAhtYGZ/SAjUz4E50CAM08GupRS0DU41oW4U8OCgA0sjU0o4VttOOBjBQAaGJvaEYJ3SjHcYvVP1koANDAUaE5O3xnf/97hD+ZKABQXPTQXCv6eQh/slEAoKg/fvznkNCMHsQzCH8yUgCgoNEhfXYJiFw6hD9ZKQBQzFlhWe37QDcKAAzw2y8/Tfm+1Vbm0cO/yup/1nxlLgWAUj5/+Tr7EKaZFZajvq/w76fz/TuDAgAFzA7L2d//bMKfChQASC5K+B55HFHO6T3CnyoUAEgsWlAecTzRzgmqUgAgqahBuee4op7ThdU/lSgAkFD0oNxyfNHPSfhTjQIAg4z80aoMYfRIoAv/efwIYF8KACSVIZSiB/saGcYZtlAAKKfTzxJnCKd7JSByScgwvlV0um+jUAAguQwhdSvkI4c/VKcAwEBnvV/NWAKih3+GMd3L+//eFAAoIkNgXUJf+MN8CgAUkiG4hD/EoABAMQJsO2NHJwoAJUX6RPGM96yC7HHdxizS+/9I92snCgAU1S3QgMcoAEB7yhIdKQBwglnbrYLtvo5jFGn7n3kUAMryXvFJx4Bby9jM5z6dRwGABgTdW8aE7hQAOMnsbVeBx7LMn4fEoQBAI0rAE+MACgDFRXu/GGH11T38Op9/hPn3UrT7sxsFABrqGoJdzxveowBAU93CsNv5wj0KAOVF22aMtA3bJRS7nOdHIs27ZYl3X3akAEBzwhF6UgBggmirscoloPK5rRVtvhGDAkALthvvqxiUFc+pAvdjDAoATBJxVVYpMCudyx4R5xkxKADAKxWCs8I5wGgKAG1E3HaMujoToDVEnF8R78OuFADgXVlLQNbjhrMpADBZxFXaRbYwzXa8I0WeV8SgANBK1O3HyA/rLKGa5TjPEHU+Rb3/ulIAgLuih2v044OIFADaiboKibpqi074vxZ1HkW97zpTAIBVjgraT//+l9CGABQACCTq6u1ib3C//PdHFAFF4rXo84dYFABairwdGf0hvjV0b/27o79eV5HnTeT7rTMFAAKK/DBflsfD997/f/TX6yb6fCEmBYC2rEr2WRvCs/4/YnCfxaUAQFAZVnVnr+yF/1sZ5gkxKQC0Fn11kuHhPuLdvqBfJ/r8iH5/dacAQHDRH/LL8jbsjwjwEV+zkgzzgtgUANqzSjnGJaCPDOoRX5NzuK/iUwAggSyrvRFBLfzfyjIfiE0BgCXHasVDn2XJMQ8y3E8oAPCXDA+tDA9/xslw/TPcRzxRACCZDCHA8Vx3jqYAwAtZVi/CoJcs1zvL/cMTBQCSyhIK7OM6M4oCAFcyrWKEQ22Zrm+m+4YnCgAklykkWM91ZTQFAN6RbTUjLGrJdj2z3S88UQDghmwPtWyhwfuyXcds9wnPPs0+AOA4l/DwUM4nW/CTnx0A+EDWIBUmuWS9XlnvD54oAHBH1odc1lDpJut1ynpf8EwBgBWyPux+++WntAFTXeZrk/V+4DUFABrIGjRVuR5EoADAStlXPUInhuzXIft9wDMFAB6Q/eGXeds5uwpjn33+85oCAA+q8BCsEEZZVBnrCvOe1xQAaKxCMEVmfIlMAYANKq2GqqxQI6k2ppXmO88UANio2kOxWmjNUHEMq81znikAsEPFh2PFEBut6phVnN88UwBgp6oPyaqhdqTKY1R1XvPMHwOCA3z+8rVsELw8L6HQ44N9rnMPCgCwWue/Ntgh+OlFAYCDVN4FuNZlV6DL9Xyp8vXkNQUADtSpBFxUKwPdrt9LFa4f6ykAcLCOJeDi+rwzBErXa3XtjGv12y8/pZgTXSgAMEDnEvBSxELgurx1Vvhf/hthHqAAwDBKwFsfjceRoWDc1xsdxu9dCyUgBgUABlIC1jNO55sR/sThFwHBYFY6RDQ7/JWD+RQAOIESQCSzw//R/48xvAKAk1weuh56zBIl+K//jYI8hx0AOJmHHTNEDH/mUgBgAiWAM0UPf+VhDgUAJlECOMPIeXbkX0NUAs6nAMBESgAjjQ7/DF+T23wIECbz4UCOFn3LnxjsAEAQdgM4QvbwVy7OowBAIEoAe2R537/mezGeAgDBfP7yVRHgIaPnzIxAVgLGUwAgKCWANbJv+Uf93h0oABCYEsBHqmz5M4cCAMF5JcC1ilv+t0Q6lmoUAEhCCWBZam/53xLxmCrwewAgEb8zoK+Owf+SPxp0PAUAElIE+jgj9MyjnrwCgMR8PqCus65tpvDPdKwZKABQgBJQy1nXM2OgZjzmqLwCgCK8FshP8K/j8wDHsAMAxXgtkM+Z1yx7+F9UOY+ZFAAoShGIb8Y1Mie4UACgOEUgntnXpMp8sAuwj88AQBMvH/oenOerErrR+DzAdnYAoKHZK9BOoo51xGPaSqHdxg4ANGZXYIws4fr5y1fXvTEFAFiWRRnYK0voX6tSArwKeJwCALyhDKwjcGJRAh6jAAAfUgZeqxgwVXYBlkUJeIQCAKx2/WCtEhof6RImlUoA6ygAwGYVC0GXwH9PlRJgF2AdBQA4zK2HbsRQERDvUwL6UACA4e49iEcEjoc/SsDHFABgOg/pWKrsAiyLEvARvwkQgDeEZn0KAADvqlICquxmHE0BAKA8JeAtBQCAm6rsAiyLEnBNAQDgQ5VKAM8UAADuqlIC7AI8UwAAaEUJeKIAALBKlV2AKuexlwIAwGqZw/Pzl6+pj/9oCgAAD8kYohmPeTQFAICHZQrUTMd6JgUAgLKE/20KAACbRA5X7/vvUwAA2CxiyEY8pogUAAB2iRS4kY4luk+zDwAA9hL8j7MDAMBuMwNY+G+jAABwiBlBLPy3UwAAOMxZgexT/vspAAAcanQwC/5jKAAApCH8j6MAAHC4EUEt/I+lAAAwxFGB7X3/GAoAAMPsDW7BP44CAEBIwn8sBQCAoR4Nclv+51AAABhubaAL/vMoAACc4l64C/9zKQAATCf8z6cAAHCa66D3vn8eBQCAU10CX/DPpQAAcDrhP58CAAANKQAA0JACAAANKQAA0JACAAANKQAA0JACAAANKQAA0JACAAANKQAA0JACAAANKQAA0JACAAANKQAA0JACAAANKQAA0JACAAANKQAA0JACAAANKQAA0JACAAANKQAA0JACAAANKQAA0JACAAANffv7rz9/M/sgAIBz2QEAgIYUAABoSAEAgIYUAABoSAEAgIYUAABoSAEAgIa+XZZl8bsAAKCP33/9+Rs7AADQkAIAAA0pAADQkAIAAA39VQB8EBAA6rvkvR0AAGhIAQCAhhQAAGjoVQHwOQAAqOtlztsBAICGFAAAaEgBAICG3hQAnwMAgHqu890OAAA0pAAAQEPvFgCvAZblH//92+xDOESV8wBgu/dy3Q4AADSkAABAQzcLgNcA+bfPsx8/APvdynM7AADQkAIAAA19WAC8Bsi7jZ71uAE4zkc5bgdghWxhmu14ATjf3QJgFwAA8rmX33YAVsqyqs5ynADMpQA8IHq4Rj8+AOJYVQC8BngWNWSjHhcA51uT23YANogWttGOB4D4VhcAuwCvRQndKMcBQAxr8/rT6AOp7BK+//n7/6Z9bwDY4qFXAHYB3nd2GAt/AN7zSE7bATjIy1AesSMg9AE40qYV/Xff//Dn0QdS1Z4yIPQBWOvRXXo7AIMJcQAi2vRjgD4LAABxbMllvwcAABraXADsAgDAfFvzeNcOgBIAAPPsyWGvAACgod0FwC4AAJxvb/7aAQCAhg4pAHYBAOA8R+TuYTsASgAAjHdU3noFAAANHVoA7AIAwDhH5uzhOwBKAAAc7+h8HfIKQAkAgOOMyFWfAQCAhoYVALsAALDfqDwdugOgBADAdiNzdPgrACUAAB43Oj99BgAAGjqlANgFAID1zsjN03YAlAAAuO+svDz1FYASAAC3nZmTp38GQAkAgLfOzscpHwJUAgDg2YxcnPZTAEoAAMzLw6k/BqgEANDZzByc/nsAlAAAOpqdf9MLwLLMHwQAOFOE3AtRAJYlxmAAwGhR8i5MAViWOIMCACNEyrlQBWBZYg0OABwlWr6FKwDLEm+QAGCPiLkWsgAsS8zBAoBHRc2zsAVgWeIOGgCsETnHQheAZYk9eABwS/T8Cn1w1777/oc/Zx8DAHwkevBfhN8BeCnLoALQU6acSlUAliXX4ALQR7Z8SnWw17wSAGC2bMF/kW4H4KWsgw5ADZlzKHUBWJbcgw9AXtnzJ/XBX/NKAIDRsgf/RfodgJeqXBQAYqqUM2VO5JrdAACOUin4L8qd0DVFAICtKgb/RalXAO+pfPEAGKd6fpQ+uWt2AwC4p3rwX7Q4yWuKAADXugT/RauTvaYIANAt+C9anvQ1RQCgn67Bf9H65K8pAgD1dQ/+C4NwgzIAUIfQf8uA3KEIAOQl+G8zMA9QBgDiE/rrGKSNlAGAOIT+4wzYAZQBgPMJ/X0M3gAKAcDxBP6xDOYJFAKAxwn8sQzuJEoBwDNhf77/A2PuMA5IE+h6AAAAAElFTkSuQmCC">
+<link rel="manifest" href='data:application/json,{"name":"US Food Recall Monitor","short_name":"Recalls","display":"standalone","background_color":"%23EEF1F4","theme_color":"%2316202A","icons":[{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAYAAAD0eNT6AAAXl0lEQVR4nO3dPXbkxtkGUEhnMsfWpJpUsxfnWoBX5QU4916kVEolx850jr6AX4tkk81GAyjU+3NvokRDAoUCnqcKTfKbhZC++/6HP2cfA8BRfv/1529mHwOvuSCTCHiAZwrC+Qz4CYQ9wOOUgrEM7gACH+B4CsGxDOYBBD7A+RSCfQzeRkIfIA5l4HEG7AFCHyA+ZWAdg3SH0AfISxm4zcDcIPgB6lAE3jIgLwh9gPqUgScGYRH8AB11LwKtT17wA9C1CLQ8acEPwLVuRaDVyQp+AO7pUgRanKTgB+BR1YvAt7MPYDThD8AW1fOjbLupfuEAOE/F3YByJyT4ARilUhEo9QpA+AMwUqWcKdFkKl0QAHLIvhuQfgdA+AMwQ/b8SV0Asg8+ALllzqGU2xeZBxyAmrK9Eki3AyD8AYgoWz6lKgDZBheAXjLlVIrtikwDCgDLEv+VQPgdAOEPQEbR8yt0AYg+eADwkcg5FrYARB40AFgrap6FLABRBwsAtoiYa+EKQMRBAoC9ouVbqAIQbXAA4EiRci5MAYg0KAAwSpS8C1EAogwGAJwhQu5NLwARBgEAzjY7/6YWgNknDwAzzczBaQVA+APAvDycUgCEPwA8m5GLpxcA4Q8Ab52dj6cWAOEPALedmZOnFQDhDwD3nZWXpxQA4Q8A652Rm9N/DwAAcL7hBcDqHwAeNzo/hxYA4Q8A243M0WEFQPgDwH6j8tRnAACgoSEFwOofAI4zIlcPLwDCHwCOd3S+HloAhD8AjHNkzvoMAAA0dFgBsPoHgPGOyttDCoDwB4DzHJG7XgEAQEO7C4DVPwCcb2/+2gEAgIZ2FQCrfwCYZ08Oby4Awh8A5tuax14BAEBDmwqA1T8AxLEllz+NOBCe/efv/9v8b//x378deCQA8OybR/+B1f99e0L/FmUAgHt+//Xn1bluB+AgI0L/1tdXBgDY66HPAFj9v290+M/+fgDk8EhO2wHYYWYQX7633QAAtli9A2D1/1qUVXiU4wAghrV57fcAbBAtdKMdDwDxrSoAVv/PooZt1OMC4HxrctsOwAOih2z04wMgDgVgpSzhmuU4AZjrbgGw/Q8A+dzLbzsAK2RbVWc7XgDO92EBsPrPG6ZZjxuA43yU43YAAKAhBQAAGrpZAGz/599Gz378AOx3K8/tAABAQwoAADT0bgGw/V9n+7zKeQCw3Xu5bgcAABpSAACgoTcFwPY/ANRzne92AACgIQUAABpSAACgoVcFwPt/AKjrZc7bAQCAhhQAAGhIAQCAhv4qAN7/A0B9l7y3AwAADSkAANCQAgAADSkAANDQt8viA4AA0Ml33//wpx0AAGhIAQCAhhQAAGhIAQCAhhQAAGhIAQCAhhQAAGjoW78DAAD6sQMAAA0pAADQkAIAAA0pAADQkAIAAA0pAADQkAIAAA0pAADQkAIAAA19mn0AAL/98tPhX/Pzl6+Hf02oRAEAhhsR8Hu/p4JAdwoAcJgZQb/VrWNVDOhCAQA2yxT4a12fk0JAVQoAsFrFwL9HIaAqBQD4UMfQ/8jL8VAGyEwBAN4Q+usoA2SmAADLsgj9vZQBslEAoDGhP4YyQAYKADQk+M9zGWtFgGgUAGhC6M9lV4BoFAAoTvDHY1eACBQAKErwx6cIMJMCAMUI/nwUAWZQAKAIwZ+fIsCZvp19AMB+wr8W15Mz2AGAxARFXXYDGE0BgIQEfx+KAKMoAJCI4O9LEeBoPgMASQh/lsU84Dh2ACA4D3yu2Q3gCHYAIDDhz0fMD/ZQACAoD3fWME/YyisACMYDnUd5JcAWdgAgEOHPHuYPj1AAIAgPb45gHrGWVwAwmQc2R/NKgDXsAMBEwp+RzC8+ogDAJB7OnME84xYFACbwUOZM5hvvUQDgZB7GzGDecc2HAOEkHsDM5sOBvGQHAE4g/InEfGRZFAAYzsOWiMxLvAKAgTxk1ztyW9q4r/PbLz95HdCYAgCDCKG3zgqbj76P6/KaEtCXAgADCJknEYPl+phcKyWgKwUADtY5UDKGiELwRAnoRwGAA3UMj2qh8fJ8ul1PJaAXBQAO0iksuoRExzKgBPShAACrdQ6Gy7l3KQLUpwDAASqHQufQf0+HXQG7AD34RUCwU9UQ+PzlqxC4o/IYVZ3XPFMAYIeKD8nKoTZK1TGrOL95pgDARtUejlVD7EwVx7DaPOeZAgAbVHooVgyt2aqNaaX5zjMFABqrFFIRGV8iUwDgQRVWQ9VWqJFVGesK857XFAB4QPaHYJUwyqjC2Gef/7ymAMBK2R9+2cOniuzXIft9wDMFABrIHjrVuB5EoADACllXPRW2navKfG2y3g+8pgDAHVkfdlnDpZus1ynrfcEzBQA+kPUhlzVUusp6vbLeHzzxx4CgkKxBgr82yPnsAMAN2R7Ewr+GbNcx233CMwUA3pHtoZYtNPhYtuuZ7X7hiQIAyWULC9ZxXRlNAYArmVYzQqK2TNc3033DEwUAksoUDmznOjOKAgAvZFnFCIVeslzvLPcPTxQASCZLGHAs152jKQDw/zKsXoRAbxmuf4b7iCcKACw5HloZHv6Ml2EeZLifUAAghQwPfc5jPnAEBYD2rFbgeO6r+BQACM5qj/eYF+ylANBa9FWKh3wtf/z4z0O/XvT5Ef3+6k4BgKCiP9x5zCX8u5UA4lIAaMvqhLNch/7RJSAy91lcCgAEZFVX3x8//vOwImC+sIUCQEuRVyUe5rXcC/kOJSDy/daZAgCBRH6I87i14d6hBBCPAgAwwKOh3ulzAcSgANBO1O1Iq7c6tob5ESUg6jyKet91pgAAHGhviB/54UD4iAJAK1FXIVFXbcyzpwREnU9R77+uFACYLOrDmscdvXKvWAKIQwEAOMCobXuvAxhFAaCNiNuPVmk1jA7prZ8LiDi/It6HXSkAADucuUK3G8CRFACYJOLqjMfMCORHv6d5xi0KAC3YdqSS7DsB7scYFACYwKosv9kh/Mj3N994jwIA8KDZ4X/hlwaxhwJAedG2G63GcosYuGuOKdq8i3ZfdqQAAKwUMfwvIh8bMSkAAAV8+ve/Zh8CySgAlBZtmzHaNizrRV5hrw3/aPMv2v3ZjQIAcEfk8IetFAA4SbTVF+tED/9Ht/7NQy4UAIAbqoU/vKQAUJb3i+wh/M/hPp1HAYAT2HblSHvD33xkWRQAgDcir/6rrPyZTwEAeCFy+MORFABKivRe0XZrHtHD/8jVf6R5Gel+7UQBAFh6hT8siwIAEJ7wZwQFAGgv8upf+DOKAgADRXrPyvs6h7/52ZsCALQVOfxhNAWAcnyimDWih3+3rX/37fkUAKAd4Q8KAAzj/SpbnB3+5mlfCgDQSuTVv5U/Z1IAgDYihz+cTQEAWoge/lb/nE0BAMoT/vCWAgCUJvzhfQoApfhZYjIR/q+5f8+lAMAAfrQqhsir/0jhb772pAAAJUUOf4hAAQDKiR7+kVb/9KUAAKUIf1hHAQA4ifAnEgUAWJYl/sp5jcjnIPyJRgEA/grOyAF6T+ZjhxkUAGjuOjgzBmn0Y7b6JyIFABq7FZzRA/Wl6Mcq/IlKAYCm7gVn9GBdlvjHKPyJTAGAhtYGZ/SAjUz4E50CAM08GupRS0DU41oW4U8OCgA0sjU0o4VttOOBjBQAaGJvaEYJ3SjHcYvVP1koANDAUaE5O3xnf/97hD+ZKABQXPTQXCv6eQh/slEAoKg/fvznkNCMHsQzCH8yUgCgoNEhfXYJiFw6hD9ZKQBQzFlhWe37QDcKAAzw2y8/Tfm+1Vbm0cO/yup/1nxlLgWAUj5/+Tr7EKaZFZajvq/w76fz/TuDAgAFzA7L2d//bMKfChQASC5K+B55HFHO6T3CnyoUAEgsWlAecTzRzgmqUgAgqahBuee4op7ThdU/lSgAkFD0oNxyfNHPSfhTjQIAg4z80aoMYfRIoAv/efwIYF8KACSVIZSiB/saGcYZtlAAKKfTzxJnCKd7JSByScgwvlV0um+jUAAguQwhdSvkI4c/VKcAwEBnvV/NWAKih3+GMd3L+//eFAAoIkNgXUJf+MN8CgAUkiG4hD/EoABAMQJsO2NHJwoAJUX6RPGM96yC7HHdxizS+/9I92snCgAU1S3QgMcoAEB7yhIdKQBwglnbrYLtvo5jFGn7n3kUAMryXvFJx4Bby9jM5z6dRwGABgTdW8aE7hQAOMnsbVeBx7LMn4fEoQBAI0rAE+MACgDFRXu/GGH11T38Op9/hPn3UrT7sxsFABrqGoJdzxveowBAU93CsNv5wj0KAOVF22aMtA3bJRS7nOdHIs27ZYl3X3akAEBzwhF6UgBggmirscoloPK5rRVtvhGDAkALthvvqxiUFc+pAvdjDAoATBJxVVYpMCudyx4R5xkxKADAKxWCs8I5wGgKAG1E3HaMujoToDVEnF8R78OuFADgXVlLQNbjhrMpADBZxFXaRbYwzXa8I0WeV8SgANBK1O3HyA/rLKGa5TjPEHU+Rb3/ulIAgLuih2v044OIFADaiboKibpqi074vxZ1HkW97zpTAIBVjgraT//+l9CGABQACCTq6u1ib3C//PdHFAFF4rXo84dYFABairwdGf0hvjV0b/27o79eV5HnTeT7rTMFAAKK/DBflsfD997/f/TX6yb6fCEmBYC2rEr2WRvCs/4/YnCfxaUAQFAZVnVnr+yF/1sZ5gkxKQC0Fn11kuHhPuLdvqBfJ/r8iH5/dacAQHDRH/LL8jbsjwjwEV+zkgzzgtgUANqzSjnGJaCPDOoRX5NzuK/iUwAggSyrvRFBLfzfyjIfiE0BgCXHasVDn2XJMQ8y3E8oAPCXDA+tDA9/xslw/TPcRzxRACCZDCHA8Vx3jqYAwAtZVi/CoJcs1zvL/cMTBQCSyhIK7OM6M4oCAFcyrWKEQ22Zrm+m+4YnCgAklykkWM91ZTQFAN6RbTUjLGrJdj2z3S88UQDghmwPtWyhwfuyXcds9wnPPs0+AOA4l/DwUM4nW/CTnx0A+EDWIBUmuWS9XlnvD54oAHBH1odc1lDpJut1ynpf8EwBgBWyPux+++WntAFTXeZrk/V+4DUFABrIGjRVuR5EoADAStlXPUInhuzXIft9wDMFAB6Q/eGXeds5uwpjn33+85oCAA+q8BCsEEZZVBnrCvOe1xQAaKxCMEVmfIlMAYANKq2GqqxQI6k2ppXmO88UANio2kOxWmjNUHEMq81znikAsEPFh2PFEBut6phVnN88UwBgp6oPyaqhdqTKY1R1XvPMHwOCA3z+8rVsELw8L6HQ44N9rnMPCgCwWue/Ntgh+OlFAYCDVN4FuNZlV6DL9Xyp8vXkNQUADtSpBFxUKwPdrt9LFa4f6ykAcLCOJeDi+rwzBErXa3XtjGv12y8/pZgTXSgAMEDnEvBSxELgurx1Vvhf/hthHqAAwDBKwFsfjceRoWDc1xsdxu9dCyUgBgUABlIC1jNO55sR/sThFwHBYFY6RDQ7/JWD+RQAOIESQCSzw//R/48xvAKAk1weuh56zBIl+K//jYI8hx0AOJmHHTNEDH/mUgBgAiWAM0UPf+VhDgUAJlECOMPIeXbkX0NUAs6nAMBESgAjjQ7/DF+T23wIECbz4UCOFn3LnxjsAEAQdgM4QvbwVy7OowBAIEoAe2R537/mezGeAgDBfP7yVRHgIaPnzIxAVgLGUwAgKCWANbJv+Uf93h0oABCYEsBHqmz5M4cCAMF5JcC1ilv+t0Q6lmoUAEhCCWBZam/53xLxmCrwewAgEb8zoK+Owf+SPxp0PAUAElIE+jgj9MyjnrwCgMR8PqCus65tpvDPdKwZKABQgBJQy1nXM2OgZjzmqLwCgCK8FshP8K/j8wDHsAMAxXgtkM+Z1yx7+F9UOY+ZFAAoShGIb8Y1Mie4UACgOEUgntnXpMp8sAuwj88AQBMvH/oenOerErrR+DzAdnYAoKHZK9BOoo51xGPaSqHdxg4ANGZXYIws4fr5y1fXvTEFAFiWRRnYK0voX6tSArwKeJwCALyhDKwjcGJRAh6jAAAfUgZeqxgwVXYBlkUJeIQCAKx2/WCtEhof6RImlUoA6ygAwGYVC0GXwH9PlRJgF2AdBQA4zK2HbsRQERDvUwL6UACA4e49iEcEjoc/SsDHFABgOg/pWKrsAiyLEvARvwkQgDeEZn0KAADvqlICquxmHE0BAKA8JeAtBQCAm6rsAiyLEnBNAQDgQ5VKAM8UAADuqlIC7AI8UwAAaEUJeKIAALBKlV2AKuexlwIAwGqZw/Pzl6+pj/9oCgAAD8kYohmPeTQFAICHZQrUTMd6JgUAgLKE/20KAACbRA5X7/vvUwAA2CxiyEY8pogUAAB2iRS4kY4luk+zDwAA9hL8j7MDAMBuMwNY+G+jAABwiBlBLPy3UwAAOMxZgexT/vspAAAcanQwC/5jKAAApCH8j6MAAHC4EUEt/I+lAAAwxFGB7X3/GAoAAMPsDW7BP44CAEBIwn8sBQCAoR4Nclv+51AAABhubaAL/vMoAACc4l64C/9zKQAATCf8z6cAAHCa66D3vn8eBQCAU10CX/DPpQAAcDrhP58CAAANKQAA0JACAAANKQAA0JACAAANKQAA0JACAAANKQAA0JACAAANKQAA0JACAAANKQAA0JACAAANKQAA0JACAAANKQAA0JACAAANKQAA0JACAAANKQAA0JACAAANKQAA0JACAAANKQAA0JACAAANffv7rz9/M/sgAIBz2QEAgIYUAABoSAEAgIYUAABoSAEAgIYUAABoSAEAgIa+XZZl8bsAAKCP33/9+Rs7AADQkAIAAA0pAADQkAIAAA39VQB8EBAA6rvkvR0AAGhIAQCAhhQAAGjoVQHwOQAAqOtlztsBAICGFAAAaEgBAICG3hQAnwMAgHqu890OAAA0pAAAQEPvFgCvAZblH//92+xDOESV8wBgu/dy3Q4AADSkAABAQzcLgNcA+bfPsx8/APvdynM7AADQkAIAAA19WAC8Bsi7jZ71uAE4zkc5bgdghWxhmu14ATjf3QJgFwAA8rmX33YAVsqyqs5ynADMpQA8IHq4Rj8+AOJYVQC8BngWNWSjHhcA51uT23YANogWttGOB4D4VhcAuwCvRQndKMcBQAxr8/rT6AOp7BK+//n7/6Z9bwDY4qFXAHYB3nd2GAt/AN7zSE7bATjIy1AesSMg9AE40qYV/Xff//Dn0QdS1Z4yIPQBWOvRXXo7AIMJcQAi2vRjgD4LAABxbMllvwcAABraXADsAgDAfFvzeNcOgBIAAPPsyWGvAACgod0FwC4AAJxvb/7aAQCAhg4pAHYBAOA8R+TuYTsASgAAjHdU3noFAAANHVoA7AIAwDhH5uzhOwBKAAAc7+h8HfIKQAkAgOOMyFWfAQCAhoYVALsAALDfqDwdugOgBADAdiNzdPgrACUAAB43Oj99BgAAGjqlANgFAID1zsjN03YAlAAAuO+svDz1FYASAAC3nZmTp38GQAkAgLfOzscpHwJUAgDg2YxcnPZTAEoAAMzLw6k/BqgEANDZzByc/nsAlAAAOpqdf9MLwLLMHwQAOFOE3AtRAJYlxmAAwGhR8i5MAViWOIMCACNEyrlQBWBZYg0OABwlWr6FKwDLEm+QAGCPiLkWsgAsS8zBAoBHRc2zsAVgWeIOGgCsETnHQheAZYk9eABwS/T8Cn1w1777/oc/Zx8DAHwkevBfhN8BeCnLoALQU6acSlUAliXX4ALQR7Z8SnWw17wSAGC2bMF/kW4H4KWsgw5ADZlzKHUBWJbcgw9AXtnzJ/XBX/NKAIDRsgf/RfodgJeqXBQAYqqUM2VO5JrdAACOUin4L8qd0DVFAICtKgb/RalXAO+pfPEAGKd6fpQ+uWt2AwC4p3rwX7Q4yWuKAADXugT/RauTvaYIANAt+C9anvQ1RQCgn67Bf9H65K8pAgD1dQ/+C4NwgzIAUIfQf8uA3KEIAOQl+G8zMA9QBgDiE/rrGKSNlAGAOIT+4wzYAZQBgPMJ/X0M3gAKAcDxBP6xDOYJFAKAxwn8sQzuJEoBwDNhf77/A2PuMA5IE+h6AAAAAElFTkSuQmCC","sizes":"512x512","type":"image/png"}]}'>
+<style>
+:root{
+  --paper:#EEF1F4;--panel:#FFF;--ink:#16202A;--muted:#5A6B7B;--line:#D6DEE5;
+  --line2:#E7ECF1;--c1:#C8351F;--c2:#DE8A1E;--c3:#4A7A8C;--pha:#7A5CA6;
+  --accent:#0F5C6E;--ok:#1c7d53;--warn:#8a5a12;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
+.wrap{max-width:760px;margin:0 auto;padding:0 14px 72px}
+a{color:var(--accent)}
+
+header.mast{padding:16px 0 12px;border-bottom:2px solid var(--ink);margin-bottom:14px}
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--accent);margin:0 0 5px}
+h1{font-size:24px;line-height:1.05;margin:0;font-weight:800;letter-spacing:-.01em}
+.srcline{display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:10px;align-items:center}
+.pill{font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:20px;
+  border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.pill.live{color:var(--ok);border-color:#accdb9;background:#eef7f1}
+.pill.warnp{color:var(--warn);border-color:#e3c38a;background:#fdf6e9}
+.pill.sample{color:#7d1c10;border-color:#e6a79c;background:#fdecea}
+.updated{font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:auto}
+
+.banner{border-radius:8px;padding:9px 12px;font-size:12.5px;margin-bottom:12px;display:none}
+.banner.show{display:block}
+.banner.warn{background:#fdf6e9;border:1px solid #e3c38a;color:#6b4708}
+.banner.sample{background:#fdecea;border:1px solid var(--c1);color:#7d1c10}
+
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:center}
+.controls .grow{flex:1 1 100%}
+button{font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;
+  border:1px solid var(--accent);background:var(--accent);color:#fff;
+  padding:10px 14px;border-radius:9px;min-height:44px}
+button.ghost{background:#fff;color:var(--accent)}
+button:active{transform:translateY(1px)}
+select,input[type=search]{font-family:var(--sans);font-size:15px;padding:9px 10px;
+  border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);
+  min-height:44px;width:100%}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.filt-toggle{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.filters{display:none;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.filters.open{display:grid}
+.filters .full{grid-column:1/-1}
+.fld{display:flex;flex-direction:column;gap:3px}
+.fld label{font-size:10px;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--muted);font-weight:700}
+.rowbtns{display:flex;gap:8px;flex-wrap:wrap}
+.toggle{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);
+  min-height:44px}
+.toggle input{width:20px;height:20px}
+
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:11px 13px;position:relative;overflow:hidden}
+.kpi .n{font-family:var(--mono);font-size:23px;font-weight:700;line-height:1}
+.kpi .l{font-size:11px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.06em;margin-top:5px}
+.kpi.sev::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c1)}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:14px;margin-bottom:14px;min-width:0}
+.panel h2{font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--muted);margin:0 0 10px;font-weight:700}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;
+  color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar-row{display:grid;grid-template-columns:96px 1fr 30px;align-items:center;gap:8px}
+.bar-row .name{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{background:var(--line2);border-radius:3px;height:15px;overflow:hidden}
+.stack{height:100%;display:flex;border-radius:3px;overflow:hidden}
+.stack i{display:block;height:100%}
+.tablefoot{display:flex;gap:8px;align-items:center;padding:12px;border-top:1px solid var(--line2);flex-wrap:wrap}
+.tablefoot:empty{display:none}
+.bar-fill{height:100%;background:var(--accent);border-radius:3px}
+.bar-row .v{font-family:var(--mono);font-size:12px;text-align:right;color:var(--muted)}
+
+.tablewrap{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  overflow:hidden;margin-bottom:14px}
+.rowc{border-bottom:1px solid var(--line2)}
+.rtop{display:grid;grid-template-columns:6px 1fr auto;gap:10px;padding:11px 12px;
+  align-items:center;cursor:pointer}
+.rowc:active{background:#f5f8fa}
+.spine{width:6px;height:38px;border-radius:2px;background:var(--muted)}
+.rmid{min-width:0}
+.rmeta{font-family:var(--mono);font-size:10.5px;color:var(--muted);
+  display:flex;gap:8px;margin-bottom:2px}
+.chip{font-weight:700;padding:1px 5px;border-radius:4px}
+.chip.fda{background:#e4f0f3;color:#0d4f5e}.chip.usda{background:#efe9f6;color:#5a3f86}
+.firm{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prod{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cls{font-family:var(--mono);font-size:10.5px;font-weight:700;text-align:right;white-space:nowrap}
+.detail{display:none;padding:0 12px 14px 28px;background:#fbfcfd}
+.rowc.open .detail{display:block}
+.detail dl{display:grid;grid-template-columns:104px 1fr;gap:4px 10px;margin:8px 0}
+.detail dt{font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700}
+.detail dd{margin:0;font-size:13.5px}
+.illness{background:#fff;border:1px solid var(--line);border-left:3px solid var(--c1);
+  border-radius:8px;padding:9px 11px;margin-top:8px}
+.illness .h{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--c1);font-weight:700;margin-bottom:3px}
+.spill{font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:10px;
+  border:1px solid var(--line)}
+.spill.on{color:#8a5a12;border-color:#e3c38a;background:#fdf6e9}
+.empty{padding:34px 14px;text-align:center;color:var(--muted)}
+.count{font-family:var(--mono);font-size:11px;color:var(--muted);margin:2px 2px 8px}
+
+svg text{font-family:var(--mono);font-size:10px;fill:var(--muted)}
+.axis line{stroke:var(--line)}
+.trend-scroll-wrap{display:flex;align-items:flex-start}
+.trend-axis{flex:0 0 auto}
+.trend-scroll{overflow-x:auto;overflow-y:hidden;flex:1 1 auto;min-width:0;
+  -webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.trend-scroll svg{display:block}
+
+.pol-item{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:9px 0;border-top:1px solid var(--line2)}
+.pol-date{font-family:var(--mono);font-size:11.5px;color:var(--accent);font-weight:700}
+.pol-title{font-weight:700;font-size:13px}
+.pol-sum{font-size:12px;color:var(--muted);margin-top:2px}
+.pol-eff{font-size:12px;margin-top:3px}
+.flag{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:700;
+  color:#8a5a12;background:#fdf6e9;border:1px solid #e3c38a;border-radius:4px;padding:1px 5px;margin-right:5px}
+.conf{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px}
+
+.a2hs{display:none;background:#fff;border:1px dashed var(--accent);border-radius:9px;
+  padding:9px 12px;font-size:12.5px;color:var(--accent);margin-bottom:14px}
+.a2hs.show{display:block}
+footer{margin-top:20px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+footer ul{margin:8px 0 0;padding-left:18px}
+@media(min-width:560px){.kpis{grid-template-columns:repeat(4,1fr)}.filters{grid-template-columns:repeat(3,1fr)}}
+@media(prefers-reduced-motion:reduce){button:active{transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <p class="eyebrow">Food safety surveillance &middot; FDA + USDA</p>
+    <h1>US Food Recall Monitor</h1>
+    <div class="srcline" id="srcline">
+      <span class="pill" id="pill-fda">FDA —</span>
+      <span class="pill" id="pill-usda">USDA —</span>
+      <span class="updated" id="updated"></span>
+    </div>
+  </header>
+
+  <div class="a2hs" id="a2hs">Tip: tap <b>Share → Add to Home Screen</b> to keep this as an app that refreshes on open.</div>
+  <div class="banner" id="banner"></div>
+
+  <div class="controls">
+    <button id="btn-refresh">↻ Refresh live data</button>
+    <div class="fld" style="width:120px"><label>Year</label><select id="year"></select></div>
+    <button class="filt-toggle" id="btn-filters">Filters</button>
+  </div>
+
+  <div class="filters" id="filters">
+    <div class="fld full"><label>Search firm / product</label>
+      <input type="search" id="f-q" placeholder="e.g. cheese, Listeria"></div>
+    <div class="fld"><label>Agency</label><select id="f-agency"></select></div>
+    <div class="fld"><label>Region</label><select id="f-region"></select></div>
+    <div class="fld"><label>Food type</label><select id="f-food"></select></div>
+    <div class="fld"><label>Hazard</label><select id="f-hazard"></select></div>
+    <div class="fld"><label>Class</label><select id="f-class"></select></div>
+    <div class="full rowbtns">
+      <button class="ghost" id="btn-reset">Reset</button>
+      <button class="ghost" id="btn-export">Export CSV</button>
+      <button class="ghost" id="btn-load">Load file…</button>
+      <input type="file" id="file" accept=".json,.csv" style="display:none">
+      <label class="toggle"><input type="checkbox" id="btn-sample" checked> Show sample rows</label>
+    </div>
+  </div>
+
+  <section class="kpis" id="kpis"></section>
+
+  <div class="panel">
+    <h2>Recalls per month &middot; by severity class</h2>
+    <div id="trend"></div>
+    <div class="legend" id="trend-legend"></div>
+  </div>
+  <div class="panel">
+    <h2>By region <span class="conf" style="text-transform:none">(where distributed; multi-region counted each)</span></h2>
+    <div class="bars" id="region-bars"></div>
+    <h2 style="margin-top:16px">By hazard</h2>
+    <div class="bars" id="hazard-bars"></div>
+    <div class="legend" id="bars-legend" style="margin-top:10px"></div>
+  </div>
+
+  <div class="count" id="count"></div>
+  <div class="tablewrap"><div id="rows"></div><div class="tablefoot" id="tablefoot"></div></div>
+
+  <div class="panel">
+    <h2>Policy &amp; regulatory timeline &middot; <span class="flag">flag</span> = trend confounder</h2>
+    <div id="policy"></div>
+  </div>
+
+  <footer>
+    <strong>Reading the data honestly.</strong>
+    <ul>
+      <li>A change in recall counts is not the same as a change in food safety —
+        staffing cuts or a shutdown can lower reported recalls (see timeline).</li>
+      <li>Region is derived from distribution text; multi-region recalls count in each.</li>
+      <li>Quantities aren't standardized across agencies; the raw quantity is the source of truth.</li>
+      <li>Hazard→illness notes are general CDC/FDA/USDA info, not medical advice.</li>
+    </ul>
+    <p>Live sources: openFDA Food Enforcement API &middot; USDA FSIS Recall API.</p>
+  </footer>
+</div>
+
+<script>
+const SAMPLE  = [{"agency": "USDA-FSIS", "recall_number": "SAMPLE-016-2026", "event_id": "", "firm": "Valley Fresh Eggs (SAMPLE)", "firm_city": "Modesto", "firm_state": "CA", "product_description": "Hard-cooked egg products", "reason": "Possible Listeria monocytogenes contamination", "classification": "Public Health Alert (USDA)", "status": "Ongoing", "distribution_pattern": "California, Nevada, Oregon", "quantity_raw": "quantity not estimated", "date_initiated": "2026-06-11", "date_reported": "2026-06-11", "date_closed": "", "voluntary_mandated": "", "url": "", "source_fetched_at": "SAMPLE", "is_sample": "Yes", "recall_id": "USDA-FSIS:SAMPLE-016-2026", "quantity_value": "", "quantity_unit": "", "distribution_states": "CA, NV, OR", "nationwide": "No", "regions": "West", "food_type": "Dairy & Eggs", "hazard_category": "Biological (pathogen)", "agent": "Listeria monocytogenes", "days_open": 74, "year": "2026", "month": "06"}, {"agency": "FDA", "recall_number": "SAMPLE-010-2026", "event_id": "", "firm": "Rio Grande Peppers (SAMPLE)", "firm_city": "El Paso", "firm_state": "TX", "product_description": "Fresh jalapeno peppers", "reason": "Possible Salmonella contamination", "classification": "Class I", "status": "Ongoing", "distribution_pattern": "AZ, NM, OK, TX", "quantity_raw": "14,000 cases", "date_initiated": "2026-06-02", "date_reported": "2026-06-02", "date_closed": "", "voluntary_mandated": "Voluntary: Firm Initiated", "url": "", "source_fetched_at": "SAMPLE", "is_sample": "Yes", "recall_id": "FDA:SAMPLE-010-2026", "quantity_value": "14000", "quantity_unit": "cases", "distribution_states": "AZ, NM, OK, TX", "nationwide": "No", "regions": "South, West", "food_type": "Produce", "hazard_category": "Biological (pathogen)", "agent": "Salmonella", "days_open": 83, "year": "2026", "month": "06"}, {"agency": "USDA-FSIS", "recall_number": "SAMPLE-015-2026", "event_id": "", "firm": "Mountain State Sausage (SAMPLE)", "firm_city": "Charleston", "firm_state": "WV", "product_description": "Pork breakfast sausage", "reason": "Possible foreign matter contamination (plastic)", "classification": "Class II", "status": "Terminated", "distribution_pattern": "Kentucky, Ohio, Virginia, West Virginia", "quantity_raw": "approximately 12,500 pounds", "date_initiated": "2026-05-28", "date_reported": "2026-05-28", "date_closed": "2026-06-25", "voluntary_mandated": "", "url": "", "source_fetched_at": "SAMPLE", "is_sample": "Yes", "recall_id": "USDA-FSIS:SAMPLE-015-2026", "quantity_value": "12500", "quantity_unit": "lbs", "distribution_states": "KY, OH, VA, WV", "nationwide": "No", "regions": "Midwest, South", "food_type": "Meat", "hazard_category": "Foreign material", "agent": "", "days_open": 28, "year": "2026", "month": "05"}, {"agency": "FDA", "recall_number": "SAMPLE-009-2026", "event_id": "", "firm": "Prairie Harvest Mills (SAMPLE)", "firm_city": "Wichita", "firm_state": "KS", "product_description": "All-purpose flour, 5 lb", "reason": "Possible E. coli contamination", "classification": "Class II", "status": "Terminated", "distribution_pattern": "Nationwide", "quantity_raw": "31,000 bags", "date_initiated": "2026-05-19", "date_reported": "2026-05-19", "date_closed": "2026-07-15", "voluntary_mandated": "Voluntary: Firm Initiated", "url": "", "source_fetched_at": "SAMPLE", "is_sample": "Yes", "recall_id": "FDA:SAMPLE-009-2026", "quantity_value": "31000", "quantity_unit": "bags", "distribution_states": "", "nationwide": "Yes", "regions": "Nationwide", "food_type": "Bakery & Grains", "hazard_category": "Biological (pathogen)", "agent": "E. coli (STEC/O157:H7)", "days_open": 57, "year": "2026", "month": "05"}, {"agency": "FDA", "recall_number": "SAMPLE-008-2026", "event_id": "", "firm": "Harbor Provisions (SAMPLE)", "firm_city": "Portland", "firm_state": "ME", "product_description": "Smoked salmon fillets", "reason": "Possible Listeria monocytogenes", "classification": "Class II", "status": "Ongoing", "distribution_pattern": "CT, MA, ME, NH, NY, RI, VT", "quantity_raw": "3,800 packages", "date_initiated": "2026-05-06", "date_reported": "2026-05-06", "date_closed": "", "voluntary_mandated": "Voluntary: Firm Initiated", "url": "", "source_fetched_at": "SAMPLE", "is_sample": "Yes", "recall_id": "FDA:SAMPLE-008-2026", "quantity_value": "3800", "quantity_unit": "packages", "distribution_states": "CT, MA, ME, NH, NY, RI, VT", "nationwide": "No", "regions": "Northeast", "food_type": "Seafood", "hazard_category": "Biological (pathogen)", "agent": "Listeria monocytogenes", "days_open": 110, "year": "2026", "month": "05"}, {"agency": "FDA", "recall_number": "SAMPLE-007-2026", "event_id": "", "firm": "Little Sprout Nutrition (SAMPLE)", "firm_city": "Columbus", "firm_state": "OH", "product_description": "Powdered infant formula", "reason": "Possible Cronobacter sakazakii", "classification": "Class I", "status": "Terminated", "distribution_pattern": "Nationwide", "quantity_raw": "60,000 containers", "date_initiated": "2026-04-22", "date_reported": "2026-04-22", "date_closed": "2026-06-30", "voluntary_mandated": "Voluntary: Firm Initiated", "url": "", "source_fetched_at": "SAMPLE", "is_sample": "Yes", "recall_id": "FDA:SAMPLE-007-2026", "quantity_value": "60000", "quantity_unit": "containers", "distribution_states": "", "nationwide": "Yes", "regions": "Nationwide", "food_type": "Infant & Baby Food", "hazard_category": "Biological (pathogen)", "agent": "Cronobacter sakazakii", "days_open": 69, "year": "2026", "month": "04"}, {"agency": "USDA-FSIS", "recall_number": "SAMPLE-014-2026", "event_id": "", "firm": "Coastal Cured Meats (SAMPLE)", "firm_city": "Richmond", "firm_state": "VA", "product_description": "Sliced deli ham", "reason": "Produced without benefit of inspection", "classification": "Class I", "status": "Ongoing", "distribution_pattern": "Maryland, North Carolina, Virginia", "quantity_raw": "approximately 1,900 pounds", "date_initiated": "2026-04-15", "date_reported": "2026-04-15", "date_closed": "", "voluntary_mandated": "", "url": "", "source_fetched_at": "SAMPLE", "is_sample": "Yes", "recall_id": "USDA-FSIS:SAMPLE-014-2026", "quantity_value": "1900", "quantity_unit": "lbs", "distribution_states": "MD, NC, VA", "nationwide": "No", "regions": "South", "food_type": "Meat", "hazard_category": "Processing / production", "agent": "", "days_open": 131, "year": "2026", "month": "04"}, {"agency": "FDA", "recall_number": "SAMPLE-006-2026", "event_id": "", "firm": "Cornerstone Foods (SAMPLE)", "firm_city": "Fresno", "firm_state": "CA", "product_description": "Frozen diced onions", "reason": "Possible Salmonella contamination", "classification": "Class I", "status": "Ongoing", "distribution_pattern": "AZ, CA, NV, OR, WA", "quantity_raw": "22,500 cases", "date_initiated": "2026-04-09", "date_reported": "2026-04-09", "date_closed": "", "voluntary_mandated": "Voluntary: Firm Initiated", "url": "", "source_fetched_at": "SAMPLE", "is_sample": "Yes", "recall_id": "FDA:SAMPLE-006-2026", "quantity_value": "22500", "quantity_unit": "cases", "distribution_states": "AZ, CA, NV, OR, WA", "nationwide": "No", "regions": "West", "food_type": "Produce", "hazard_category": "Biological (pathogen)", "agent": "Salmonella", "days_open": 137, "year": "2026", "month": "04"}, {"agency": "FDA", "recall_number": "SAMPLE-005-2026", "event_id": "", "firm": "Great Lakes Bakery (SAMPLE)", "firm_city": "Milwaukee", "firm_state": "WI", "product_description": "Whole wheat sandwich bread", "reason": "Mislabeled net weight", "classification": "Class III", "status": "Terminated", "distribution_pattern": "IL, IN, MI, OH, WI", "quantity_raw": "9,000 units", "date_initiated": "2026-03-28", "date_reported": "2026-03-28", "date_closed": "2026-05-01", "voluntary_mandated": "Voluntary: Firm Initiated", "url": "", "source_fetched_at": "SAMPLE", "is_sample": "Yes", "recall_id": "FDA:SAMPLE-005-2026", "quantity_value": "9000", "quantity_unit": "units", "distribution_states": "IL, IN, MI, OH, WI", "nationwide": "No", "regions": "Midwest", "food_type": "Bakery & Grains", "hazard_category": "Labeling / quality", "agent": "", "days_open": 34, "year": "2026", "month": "03"}, {"agency": "USDA-FSIS", "recall_number": "SAMPLE-013-2026", "event_id": "", "firm": "Cedar Valley Foods (SAMPLE)", "firm_city": "Cedar Rapids", "firm_state": "IA", "product_description": "Ready-to-eat chicken salad wraps", "reason": "Misbranding and undeclared egg", "classification": "Class II", "status": "Terminated", "distribution_pattern": "Illinois, Iowa, Minnesota, Wisconsin", "quantity_raw": "approximately 7,200 pounds", "date_initiated": "2026-03-20", "date_reported": "2026-03-20", "date_closed": "2026-04-30", "voluntary_mandated": "", "url": "", "source_fetched_at": "SAMPLE", "is_sample": "Yes", "recall_id": "USDA-FSIS:SAMPLE-013-2026", "quantity_value": "7200", "quantity_unit": "lbs", "distribution_states": "IA, IL, MN, WI", "nationwide": "No", "regions": "Midwest", "food_type": "Poultry", "hazard_category": "Undeclared allergen", "agent": "Egg", "days_open": 41, "year": "2026", "month": "03"}, {"agency": "FDA", "recall_number": "SAMPLE-004-2026", "event_id": "", "firm": "Sunbelt Snack Foods (SAMPLE)", "firm_city": "Austin", "firm_state": "TX", "product_description": "Chocolate granola bars", "reason": "Undeclared peanut", "classification": "Class II", "status": "Ongoing", "distribution_pattern": "Nationwide", "quantity_raw": "42,000 units", "date_initiated": "2026-03-11", "date_reported": "2026-03-11", "date_closed": "", "voluntary_mandated": "Voluntary: Firm Initiated", "url": "", "source_fetched_at": "SAMPLE", "is_sample": "Yes", "recall_id": "FDA:SAMPLE-004-2026", "quantity_value": "42000", "quantity_unit": "units", "distribution_states": "", "nationwide": "Yes", "regions": "Nationwide", "food_type": "Nuts, Seeds & Butters", "hazard_category": "Undeclared allergen", "agent": "Peanut", "days_open": 166, "year": "2026", "month": "03"}, {"agency": "FDA", "recall_number": "SAMPLE-003-2026", "event_id": "", "firm": "Gulfline Seafood (SAMPLE)", "firm_city": "Biloxi", "firm_state": "MS", "product_description": "Frozen cooked shrimp", "reason": "Undeclared sulfites", "classification": "Class II", "status": "Terminated", "distribution_pattern": "AL, FL, GA, LA, MS, TX", "quantity_raw": "5,400 bags", "date_initiated": "2026-02-20", "date_reported": "2026-02-20", "date_closed": "2026-04-10", "voluntary_mandated": "Voluntary: Firm Initiated", "url": "", "source_fetched_at": "SAMPLE", "is_sample": "Yes", "recall_id": "FDA:SAMPLE-003-2026", "quantity_value": "5400", "quantity_unit": "bags", "distribution_states": "AL, FL, GA, LA, MS, TX", "nationwide": "No", "regions": "South", "food_type": "Seafood", "hazard_category": "Undeclared allergen", "agent": "Sulfite", "days_open": 49, "year": "2026", "month": "02"}, {"agency": "USDA-FSIS", "recall_number": "SAMPLE-012-2026", "event_id": "", "firm": "Heritage Poultry Co. (SAMPLE)", "firm_city": "Springdale", "firm_state": "AR", "product_description": "Frozen breaded chicken patties", "reason": "Possible Salmonella contamination", "classification": "Class I", "status": "Ongoing", "distribution_pattern": "Arkansas, Missouri, Oklahoma, Texas", "quantity_raw": "approximately 68,000 pounds", "date_initiated": "2026-02-14", "date_reported": "2026-02-14", "date_closed": "", "voluntary_mandated": "", "url": "", "source_fetched_at": "SAMPLE", "is_sample": "Yes", "recall_id": "USDA-FSIS:SAMPLE-012-2026", "quantity_value": "68000", "quantity_unit": "lbs", "distribution_states": "AR, KS, MO, OK, TX", "nationwide": "No", "regions": "Midwest, South", "food_type": "Poultry", "hazard_category": "Biological (pathogen)", "agent": "Salmonella", "days_open": 191, "year": "2026", "month": "02"}, {"agency": "FDA", "recall_number": "SAMPLE-002-2026", "event_id": "", "firm": "Cascade Produce LLC (SAMPLE)", "firm_city": "Salinas", "firm_state": "CA", "product_description": "Bagged chopped romaine lettuce", "reason": "E. coli O157:H7 contamination", "classification": "Class I", "status": "Ongoing", "distribution_pattern": "Nationwide", "quantity_raw": "18,000 cases", "date_initiated": "2026-02-03", "date_reported": "2026-02-03", "date_closed": "", "voluntary_mandated": "Voluntary: Firm Initiated", "url": "", "source_fetched_at": "SAMPLE", "is_sample": "Yes", "recall_id": "FDA:SAMPLE-002-2026", "quantity_value": "18000", "quantity_unit": "cases", "distribution_states": "", "nationwide": "Yes", "regions": "Nationwide", "food_type": "Produce", "hazard_category": "Biological (pathogen)", "agent": "E. coli (STEC/O157:H7)", "days_open": 202, "year": "2026", "month": "02"}, {"agency": "USDA-FSIS", "recall_number": "SAMPLE-011-2026", "event_id": "", "firm": "Summit Meat Packing (SAMPLE)", "firm_city": "Greeley", "firm_state": "CO", "product_description": "Ready-to-eat beef franks", "reason": "Possible Listeria monocytogenes contamination", "classification": "Class I", "status": "Terminated", "distribution_pattern": "Colorado, Kansas, Nebraska, Wyoming", "quantity_raw": "approximately 24,000 pounds", "date_initiated": "2026-01-27", "date_reported": "2026-01-27", "date_closed": "2026-03-18", "voluntary_mandated": "", "url": "", "source_fetched_at": "SAMPLE", "is_sample": "Yes", "recall_id": "USDA-FSIS:SAMPLE-011-2026", "quantity_value": "24000", "quantity_unit": "lbs", "distribution_states": "CO, KS, NE, WY", "nationwide": "No", "regions": "Midwest, West", "food_type": "Meat", "hazard_category": "Biological (pathogen)", "agent": "Listeria monocytogenes", "days_open": 50, "year": "2026", "month": "01"}, {"agency": "FDA", "recall_number": "SAMPLE-001-2026", "event_id": "", "firm": "Northvale Dairy Co. (SAMPLE)", "firm_city": "Rochester", "firm_state": "NY", "product_description": "Soft-ripened cheese, 8 oz rounds", "reason": "Possible Listeria monocytogenes contamination", "classification": "Class I", "status": "Terminated", "distribution_pattern": "CT, MA, NY, NJ, PA", "quantity_raw": "3,200 units", "date_initiated": "2026-01-14", "date_reported": "2026-01-14", "date_closed": "2026-03-02", "voluntary_mandated": "Voluntary: Firm Initiated", "url": "", "source_fetched_at": "SAMPLE", "is_sample": "Yes", "recall_id": "FDA:SAMPLE-001-2026", "quantity_value": "3200", "quantity_unit": "units", "distribution_states": "CT, MA, NJ, NY, PA", "nationwide": "No", "regions": "Northeast", "food_type": "Dairy & Eggs", "hazard_category": "Biological (pathogen)", "agent": "Listeria monocytogenes", "days_open": 47, "year": "2026", "month": "01"}];
+const POLICY  = [{"date": "2022-11-21", "title": "FSMA 204 Food Traceability Final Rule published", "summary": "Enhanced farm-to-fork recordkeeping (Key Data Elements at Critical Tracking Events) for high-risk 'Food Traceability List' foods; designed to speed traceback from weeks to days.", "effect_on_recalls": "When in force, expected to make recalls faster and more precise, not necessarily more or fewer.", "confidence": "well-established", "source": "FDA; 87 FR 70910"}, {"date": "2025-03-20", "title": "FDA announces intent to delay FSMA 204 compliance by 30 months", "summary": "Compliance date proposed to move from Jan 20, 2026 to July 20, 2028, citing industry-wide readiness/coordination.", "effect_on_recalls": "Delays the traceability improvements that would sharpen recall response.", "confidence": "well-established", "source": "FDA Constituent Update, Mar 2025"}, {"date": "2025-08-07", "title": "Proposed rule to extend FSMA 204 to July 20, 2028 published", "summary": "Formal Notice of Proposed Rulemaking in the Federal Register; comment period closed Sep 8, 2025.", "effect_on_recalls": "Procedural step toward the delay.", "confidence": "well-established", "source": "90 FR / Federal Register, Aug 7, 2025"}, {"date": "2025-11-12", "title": "Longest US government shutdown ends; FY2026 appropriations", "summary": "Appropriations act codifies the FSMA 204 delay (no enforcement funds before July 20, 2028) and restricts enforcement funds for the Produce Safety Rule and pre-harvest agricultural water rule for certain commodities. FDA Human Foods Program funded at ~$1.17B for FY2026.", "effect_on_recalls": "CONFOUNDER: a prolonged shutdown can suppress recall *reporting/classification* for weeks, independent of actual food safety.", "confidence": "supported-but-contested", "source": "P.L. 119-37, Div. B; CRS R48925"}, {"date": "2026-01-20", "title": "Original FSMA 204 compliance date (now not enforced)", "summary": "The date the rule would have taken effect absent the delay. Congress directed FDA not to enforce before July 20, 2028.", "effect_on_recalls": "No traceability step-change occurs on this date.", "confidence": "well-established", "source": "FDA; P.L. 119-37"}, {"date": "2025-2026", "title": "Proposed FDA budget cut and FDA/USDA staffing reductions", "summary": "Draft FY2026 budget documents proposed a ~17% FDA cut; workforce reductions at FDA and USDA reported. Some routine food-facility inspection potentially shifting to states.", "effect_on_recalls": "CONFOUNDER: reduced inspection/lab capacity can lower the number of recalls that get detected and issued, which is NOT the same as safer food.", "confidence": "supported-but-contested", "source": "Reporting on FY2026 budget drafts; CRS"}, {"date": "2028-07-20", "title": "Extended FSMA 204 compliance date", "summary": "New enforcement date for the Food Traceability Rule.", "effect_on_recalls": "From here, faster/more-precise recalls expected once traceability records are in force.", "confidence": "well-established", "source": "P.L. 119-37; FDA"}];
+const ILLNESS = {"Listeria monocytogenes": {"agent": "Listeria monocytogenes", "category": "Biological (pathogen)", "illness": "Listeriosis", "symptoms": "Fever, muscle aches, sometimes diarrhea; can spread to the nervous system (headache, stiff neck, confusion).", "onset": "Same day up to ~10 weeks (median ~1-4 weeks)", "higher_risk": "Pregnant people, newborns, adults 65+, immunocompromised. Can cause miscarriage/stillbirth.", "confidence": "well-established", "source": "CDC Listeria; FDA"}, "Salmonella": {"agent": "Salmonella", "category": "Biological (pathogen)", "illness": "Salmonellosis", "symptoms": "Diarrhea (sometimes bloody), fever, stomach cramps, vomiting.", "onset": "6 hours - 6 days", "higher_risk": "Children under 5, adults 65+, immunocompromised.", "confidence": "well-established", "source": "CDC Salmonella; USDA FSIS"}, "E. coli (STEC/O157:H7)": {"agent": "E. coli (STEC/O157:H7)", "category": "Biological (pathogen)", "illness": "Shiga toxin-producing E. coli infection", "symptoms": "Severe stomach cramps, diarrhea (often bloody), vomiting.", "onset": "3-4 days (range 1-10)", "higher_risk": "Young children and older adults at risk of hemolytic uremic syndrome (HUS), a type of kidney failure.", "confidence": "well-established", "source": "CDC E. coli"}, "Clostridium botulinum": {"agent": "Clostridium botulinum", "category": "Biological (pathogen)", "illness": "Botulism", "symptoms": "Double/blurred vision, drooping eyelids, slurred speech, difficulty swallowing, muscle weakness. A medical emergency.", "onset": "18-36 hours (range 6 hours - 10 days)", "higher_risk": "Anyone; infants at special risk from certain foods. Can cause paralysis and be fatal.", "confidence": "well-established", "source": "CDC Botulism"}, "Hepatitis A virus": {"agent": "Hepatitis A virus", "category": "Biological (pathogen)", "illness": "Hepatitis A", "symptoms": "Fatigue, nausea, stomach pain, jaundice (yellow skin/eyes), dark urine.", "onset": "15-50 days (average ~28)", "higher_risk": "Unvaccinated people; more severe in older adults and those with liver disease.", "confidence": "well-established", "source": "CDC Hepatitis A"}, "Norovirus": {"agent": "Norovirus", "category": "Biological (pathogen)", "illness": "Norovirus gastroenteritis", "symptoms": "Sudden vomiting, diarrhea, nausea, stomach pain.", "onset": "12-48 hours", "higher_risk": "Very contagious; dehydration risk in young children and older adults.", "confidence": "well-established", "source": "CDC Norovirus"}, "Cronobacter sakazakii": {"agent": "Cronobacter sakazakii", "category": "Biological (pathogen)", "illness": "Cronobacter infection", "symptoms": "In infants: fever, poor feeding, crying, low energy; can cause sepsis or meningitis.", "onset": "Days", "higher_risk": "Infants (especially <2 months), premature babies, immunocompromised. Linked to powdered infant formula.", "confidence": "well-established", "source": "CDC Cronobacter; FDA"}, "Staphylococcus aureus": {"agent": "Staphylococcus aureus", "category": "Biological (pathogen)", "illness": "Staphylococcal food poisoning", "symptoms": "Sudden nausea, vomiting, stomach cramps; usually short-lived.", "onset": "30 minutes - 8 hours", "higher_risk": "Anyone; caused by a toxin, so cooking does not always make food safe.", "confidence": "well-established", "source": "CDC Staph"}, "Cyclospora": {"agent": "Cyclospora", "category": "Biological (pathogen)", "illness": "Cyclosporiasis", "symptoms": "Watery diarrhea, loss of appetite, cramping, fatigue; can relapse.", "onset": "~1 week", "higher_risk": "Often linked to fresh produce; anyone exposed.", "confidence": "well-established", "source": "CDC Cyclospora"}, "Undeclared allergen": {"agent": "Undeclared allergen", "category": "Undeclared allergen", "illness": "Allergic reaction (up to anaphylaxis)", "symptoms": "Hives, swelling, vomiting, trouble breathing; severe reactions (anaphylaxis) can be life-threatening.", "onset": "Seconds to ~2 hours after eating", "higher_risk": "People allergic to the undeclared ingredient (e.g., milk, egg, peanut, tree nut, soy, wheat, fish, shellfish, sesame).", "confidence": "well-established", "source": "FDA Food Allergies; FASTER Act (sesame, 2023)"}, "Foreign material": {"agent": "Foreign material", "category": "Foreign material", "illness": "Physical injury / choking", "symptoms": "Choking, dental damage, cuts, or internal injury from metal, plastic, glass, etc.", "onset": "On consumption", "higher_risk": "Anyone; higher concern for children.", "confidence": "well-established", "source": "FDA / USDA FSIS recall classifications"}};
+const REGION_OF = {"CT": "Northeast", "ME": "Northeast", "MA": "Northeast", "NH": "Northeast", "RI": "Northeast", "VT": "Northeast", "NJ": "Northeast", "NY": "Northeast", "PA": "Northeast", "IL": "Midwest", "IN": "Midwest", "MI": "Midwest", "OH": "Midwest", "WI": "Midwest", "IA": "Midwest", "KS": "Midwest", "MN": "Midwest", "MO": "Midwest", "NE": "Midwest", "ND": "Midwest", "SD": "Midwest", "DE": "South", "FL": "South", "GA": "South", "MD": "South", "NC": "South", "SC": "South", "VA": "South", "DC": "South", "WV": "South", "AL": "South", "KY": "South", "MS": "South", "TN": "South", "AR": "South", "LA": "South", "OK": "South", "TX": "South", "AZ": "West", "CO": "West", "ID": "West", "MT": "West", "NV": "West", "NM": "West", "UT": "West", "WY": "West", "AK": "West", "CA": "West", "HI": "West", "OR": "West", "WA": "West", "PR": "Territories", "GU": "Territories", "VI": "Territories"};
+const STATE_ABBR = {"alabama": "AL", "alaska": "AK", "arizona": "AZ", "arkansas": "AR", "california": "CA", "colorado": "CO", "connecticut": "CT", "delaware": "DE", "florida": "FL", "georgia": "GA", "hawaii": "HI", "idaho": "ID", "illinois": "IL", "indiana": "IN", "iowa": "IA", "kansas": "KS", "kentucky": "KY", "louisiana": "LA", "maine": "ME", "maryland": "MD", "massachusetts": "MA", "michigan": "MI", "minnesota": "MN", "mississippi": "MS", "missouri": "MO", "montana": "MT", "nebraska": "NE", "nevada": "NV", "new hampshire": "NH", "new jersey": "NJ", "new mexico": "NM", "new york": "NY", "north carolina": "NC", "north dakota": "ND", "ohio": "OH", "oklahoma": "OK", "oregon": "OR", "pennsylvania": "PA", "rhode island": "RI", "south carolina": "SC", "south dakota": "SD", "tennessee": "TN", "texas": "TX", "utah": "UT", "vermont": "VT", "virginia": "VA", "washington": "WA", "west virginia": "WV", "wisconsin": "WI", "wyoming": "WY", "district of columbia": "DC", "washington dc": "DC", "washington d.c.": "DC", "puerto rico": "PR", "guam": "GU", "virgin islands": "VI"};
+const FOOD_RULES = [["Infant & Baby Food", ["infant formula", "baby food", "infant", "toddler formula"]], ["Pet & Animal Food", ["pet food", "dog food", "cat food", "dog treat", "cat treat", "animal feed", "pet treat", "kibble", "canine", "feline"]], ["Dietary Supplements", ["supplement", "vitamin", "capsule", "softgel", "gummies", "probiotic", "herbal"]], ["Seafood", ["fish", "salmon", "tuna", "shrimp", "crab", "lobster", "oyster", "clam", "mussel", "scallop", "seafood", "tilapia", "catfish", "cod", "anchovy", "sardine", "smoked fish"]], ["Poultry", ["chicken", "turkey", "poultry", "duck", "hen"]], ["Meat", ["beef", "pork", "bacon", "sausage", "ham", "steak", "ground beef", "veal", "lamb", "goat", "meat", "jerky", "hot dog", "frankfurter", "salami", "pepperoni", "brisket", "ribs", "bison"]], ["Dairy & Eggs", ["milk", "cheese", "yogurt", "butter", "cream", "dairy", "egg", "ice cream", "kefir", "custard"]], ["Produce", ["lettuce", "spinach", "onion", "tomato", "cucumber", "melon", "cantaloupe", "pepper", "carrot", "apple", "berry", "berries", "peach", "mango", "sprout", "leafy green", "salad mix", "vegetable", "fruit", "produce", "avocado", "potato", "mushroom", "cilantro", "herb", "grape"]], ["Nuts, Seeds & Butters", ["peanut", "almond", "cashew", "walnut", "pecan", "pistachio", "nut butter", "tahini", "seed", "sunflower", "trail mix", "granola bar"]], ["Bakery & Grains", ["bread", "flour", "cereal", "cracker", "cookie", "cake", "muffin", "pasta", "rice", "oat", "grain", "tortilla", "bagel", "pastry", "dough", "pizza"]], ["Snacks & Confectionery", ["chip", "snack", "candy", "chocolate", "popcorn", "pretzel", "confection", "caramel"]], ["Beverages", ["juice", "beverage", "drink", "soda", "water", "coffee", "tea", "smoothie", "kombucha", "cider"]], ["Condiments, Sauces & Spices", ["sauce", "dressing", "condiment", "spice", "seasoning", "salsa", "dip", "hummus", "gravy", "marinade", "ketchup", "mustard", "mayonnaise", "pickle"]], ["Prepared & Ready-to-Eat", ["ready-to-eat", "ready to eat", "rte", "prepared", "frozen meal", "entree", "soup", "wrap", "sandwich", "burrito", "sushi", "deli", "meal kit"]]];
+const PATHOGENS = {"Listeria monocytogenes": ["listeria"], "Salmonella": ["salmonella"], "E. coli (STEC/O157:H7)": ["e. coli", "e.coli", "escherichia", "stec", "o157", "shiga toxin"], "Clostridium botulinum": ["botulinum", "botulism"], "Hepatitis A virus": ["hepatitis a", "hepatitis"], "Norovirus": ["norovirus"], "Cronobacter sakazakii": ["cronobacter"], "Staphylococcus aureus": ["staphylococcus", "staph "], "Cyclospora": ["cyclospora"], "Bacillus cereus": ["bacillus cereus"], "Vibrio": ["vibrio"], "Clostridium perfringens": ["perfringens"]};
+const ALLERGENS = ["milk", "egg", "soy", "wheat", "gluten", "peanut", "tree nut", "almond", "cashew", "walnut", "pecan", "hazelnut", "fish", "shellfish", "crustacean", "sesame", "sulfite", "mustard", "coconut", "pistachio"];
+
+const CLASS_ORDER=["Class I","Class II","Class III","Public Health Alert (USDA)"];
+const CLASS_COLOR={"Class I":"#C8351F","Class II":"#DE8A1E","Class III":"#4A7A8C","Public Health Alert (USDA)":"#7A5CA6"};
+const REGION_ORDER=["Northeast","Midwest","South","West","Territories","Nationwide","Unknown"];
+const ABBR_SET=new Set(Object.values(STATE_ABBR));
+const $=s=>document.querySelector(s), uniq=a=>[...new Set(a.filter(Boolean))];
+let DATA=SAMPLE.slice(), sortKey="date_reported", sortDir=-1;
+const PAGE=50; let shown=PAGE, tableRows=[];
+
+/* ---------- ported classifiers (mirror reference_data.py) ---------- */
+function parseStates(text){
+  if(!text) return [new Set(),false];
+  const low=text.toLowerCase();
+  const nation=["nationwide","nation wide","national distribution",
+    "throughout the united states","all 50 states","throughout the u.s","throughout the us"]
+    .some(k=>low.includes(k));
+  const found=new Set();
+  for(const name in STATE_ABBR){ if(low.includes(name)) found.add(STATE_ABBR[name]); }
+  (text.match(/\b[A-Z]{2}\b/g)||[]).forEach(t=>{ if(ABBR_SET.has(t)) found.add(t); });
+  return [found,nation];
+}
+function regionsFor(states,nation){
+  if(nation) return ["Nationwide"];
+  const r=[...new Set([...states].map(s=>REGION_OF[s]||"Unknown"))].sort();
+  return r.length?r:["Unknown"];
+}
+function categorizeFood(desc){
+  if(!desc) return "Uncategorized";
+  const low=desc.toLowerCase();
+  for(const [label,keys] of FOOD_RULES){ if(keys.some(k=>low.includes(k))) return label; }
+  return "Other / Multiple";
+}
+function classifyHazard(reason){
+  if(!reason) return ["Unspecified",""];
+  const low=reason.toLowerCase();
+  for(const agent in PATHOGENS){ if(PATHOGENS[agent].some(k=>low.includes(k))) return ["Biological (pathogen)",agent]; }
+  if(low.includes("allerg")||low.includes("undeclared")||low.includes("unreported")||low.includes("misbrand")){
+    for(const a of ALLERGENS){ if(low.includes(a)) return ["Undeclared allergen",a.replace(/\b\w/,c=>c.toUpperCase())]; }
+    if(low.includes("allerg")) return ["Undeclared allergen","Unspecified allergen"];
+  }
+  if(["foreign material","foreign matter","metal","plastic","glass","wood","rubber","bone","extraneous"].some(k=>low.includes(k))) return ["Foreign material",""];
+  if(["chemical","benzene","lead","arsenic","cadmium","heavy metal","pesticide","toxin","aflatoxin","cleaning","sanitizer","melamine","pfas"].some(k=>low.includes(k))) return ["Chemical / contaminant",""];
+  if(["without benefit of inspection","without the benefit of inspection","not presented for import","import violation","underprocess","undercook","temperature abuse","insanitary","unsanitary","adulterat"].some(k=>low.includes(k))) return ["Processing / production",""];
+  if(["mislabel","label","spoil","mold","off-odor","quality","expired","date","packaging"].some(k=>low.includes(k))) return ["Labeling / quality",""];
+  return ["Other / Unspecified",""];
+}
+const QUNITS=/([\d][\d,\.]*)\s*(lb|lbs|pound|pounds|case|cases|unit|units|bottle|bottles|bag|bags|box|boxes|carton|cartons|container|containers|jar|jars|package|packages|can|cans|oz|ounce|ounces|kg|count|pouch|pouches|tray|trays)\b/i;
+function parseQty(){ for(const t of arguments){ if(!t) continue; const m=(""+t).match(QUNITS);
+  if(m){let u=m[2].toLowerCase(); u=({lb:"lbs",pound:"lbs",pounds:"lbs"})[u]||u; return [m[1].replace(/,/g,""),u];}} return ["",""]; }
+function iso(s){ if(!s) return ""; s=(""+s).trim();
+  if(/^\d{8}$/.test(s)) return s.slice(0,4)+"-"+s.slice(4,6)+"-"+s.slice(6,8);
+  const m=s.match(/(\d{4})-(\d{2})-(\d{2})/); return m?m[0]:""; }
+function daysBetween(a,b){ if(!a||!b) return ""; const d=(new Date(b)-new Date(a))/86400000; return isFinite(d)?Math.round(d):""; }
+function enrich(r){
+  const [states,nation]=parseStates(r.distribution_pattern||"");
+  r.distribution_states=[...states].sort().join(", ");
+  r.nationwide=nation?"Yes":"No";
+  r.regions=regionsFor(states,nation).join(", ");
+  r.food_type=categorizeFood(r.product_description||"");
+  const [cat,agent]=classifyHazard(r.reason||"");
+  r.hazard_category=cat; r.agent=agent;
+  const ref=r.date_closed||new Date().toISOString().slice(0,10);
+  r.days_open=r.date_initiated?daysBetween(r.date_initiated,ref):"";
+  const basis=r.date_reported||r.date_initiated||"";
+  r.year=basis.slice(0,4); r.month=basis.slice(5,7);
+  const [qv,qu]=parseQty(r.quantity_raw); r.quantity_value=qv; r.quantity_unit=qu;
+  return r;
+}
+
+/* ---------- live fetch ---------- */
+async function tfetch(url,ms){ ms=ms||15000;
+  const ctl=new AbortController(), t=setTimeout(()=>ctl.abort(),ms);
+  try{ return await fetch(url,{signal:ctl.signal}); }
+  finally{ clearTimeout(t); }
+}
+function normFDA(r){
+  return enrich({
+    agency:"FDA", recall_number:r.recall_number||"", event_id:r.event_id||"",
+    firm:r.recalling_firm||"", firm_city:r.city||"", firm_state:r.state||"",
+    product_description:(r.product_description||"").slice(0,500),
+    reason:r.reason_for_recall||"", classification:r.classification||"",
+    status:r.status||"", distribution_pattern:r.distribution_pattern||"",
+    quantity_raw:r.product_quantity||"",
+    date_initiated:iso(r.recall_initiation_date), date_reported:iso(r.report_date),
+    date_closed:iso(r.termination_date), voluntary_mandated:r.voluntary_mandated||"",
+    url:"https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts",
+    is_sample:"No",
+    recall_id:"FDA:"+(r.recall_number||r.event_id||Math.random())
+  });
+}
+function fsisClass(rk){ if(!rk) return ""; const m=(""+rk).match(/Class\s+I{1,3}/);
+  if(m) return m[0]; if((""+rk).toLowerCase().includes("alert")) return "Public Health Alert (USDA)"; return rk; }
+function normFSIS(r){
+  const num=(r.field_recall_number||"").trim();
+  const reason=(r.field_recall_reason||r.field_summary||"").replace(/\s+/g," ").trim();
+  const prod=(r.field_product_items||r.field_title||"").replace(/\s+/g," ").trim();
+  const rec=enrich({
+    agency:"USDA-FSIS", recall_number:num, event_id:"",
+    firm:(r.field_establishment||"").replace(/\s+/g," ").trim(), firm_city:"", firm_state:"",
+    product_description:prod.slice(0,500), reason:reason,
+    classification:fsisClass(r.field_risk_level),
+    status:(""+r.field_active_notice).toLowerCase()==="true"?"Active":"Closed",
+    distribution_pattern:(r.field_states||"").replace(/\s+/g," ").trim(),
+    quantity_raw:(r.field_summary||"").replace(/\s+/g," ").trim().slice(0,300),
+    date_initiated:iso(r.field_recall_date||r.field_last_modified_date),
+    date_reported:iso(r.field_recall_date||r.field_last_modified_date),
+    date_closed:iso(r.field_closed_date), voluntary_mandated:"",
+    url:"https://www.fsis.usda.gov/recalls", is_sample:"No",
+    recall_id:"USDA:"+(num||prod.slice(0,24))
+  });
+  const [qv,qu]=parseQty(r.field_summary,prod,r.field_title); rec.quantity_value=qv; rec.quantity_unit=qu;
+  return rec;
+}
+async function fetchFDA(year){
+  let out=[], skip=0;
+  for(let page=0; page<5; page++){
+    const url=`https://api.fda.gov/food/enforcement.json?search=report_date:[${year}0101+TO+${year}1231]&limit=1000&skip=${skip}`;
+    const res=await tfetch(url);
+    if(res.status===404) break;
+    if(!res.ok) throw new Error("FDA HTTP "+res.status);
+    const j=await res.json(); const results=j.results||[];
+    if(!results.length) break;
+    out=out.concat(results.map(normFDA)); skip+=results.length;
+    if(results.length<1000) break;
+  }
+  return out;
+}
+async function fetchFSIS(year){
+  const res=await tfetch("https://www.fsis.usda.gov/fsis/api/recall/v/1");
+  if(!res.ok) throw new Error("FSIS HTTP "+res.status);
+  let data=await res.json(); if(data&&data.results) data=data.results;
+  return (data||[]).filter(r=>{
+    const num=(""+(r.field_recall_number||"")); const suff=num.includes("-")?num.split("-").pop():"";
+    return String(year)===String(r.field_year)||String(year)===suff;
+  }).map(normFSIS);
+}
+function setPill(id,cls,txt){ const el=$(id); el.className="pill "+cls; el.textContent=txt; }
+function banner(kind,html){ const b=$("#banner"); if(!kind){b.className="banner";b.innerHTML="";return;}
+  b.className="banner show "+kind; b.innerHTML=html; }
+
+async function refresh(){
+  const year=$("#year").value;
+  setPill("#pill-fda","","FDA …"); setPill("#pill-usda","","USDA …");
+  $("#btn-refresh").disabled=true;
+  const [fda,usda]=await Promise.allSettled([fetchFDA(year),fetchFSIS(year)]);
+  let live=[], notes=[];
+  if(fda.status==="fulfilled"){ live=live.concat(fda.value);
+    setPill("#pill-fda","live",`FDA ● ${fda.value.length}`); }
+  else { setPill("#pill-fda","warnp","FDA ▲ blocked");
+    notes.push("FDA live fetch failed ("+(fda.reason&&fda.reason.message||"network/CORS")+")."); }
+  if(usda.status==="fulfilled"){ live=live.concat(usda.value);
+    setPill("#pill-usda","live",`USDA ● ${usda.value.length}`); }
+  else { setPill("#pill-usda","warnp","USDA ▲ blocked");
+    notes.push("USDA doesn't allow in-browser fetch here — use <b>Load file…</b> with a USDA CSV/JSON, or refresh USDA from the desktop tool."); }
+
+  if(live.length){
+    const m=new Map(); live.forEach(r=>m.set(r.recall_id,r)); DATA=[...m.values()];
+    $("#btn-sample").checked=false;
+    $("#updated").textContent="updated "+new Date().toLocaleString();
+    if(notes.length) banner("warn",notes.join(" ")); else banner();
+  } else {
+    setPill("#pill-fda","sample","FDA — sample"); setPill("#pill-usda","sample","USDA — sample");
+    banner("sample","Couldn't reach the live APIs from this browser, so this is <b>sample</b> data. "
+      +"This is expected if you opened the file locally — host it at a URL (or add to Home Screen) and tap Refresh. "
+      +notes.join(" "));
+  }
+  $("#btn-refresh").disabled=false;
+  populate(); render();
+}
+
+/* ---------- filtering + views (shared with desktop) ---------- */
+function opts(sel,vals,all="All"){ sel.innerHTML=`<option value="">${all}</option>`+vals.map(v=>`<option>${v}</option>`).join(""); }
+function populate(){
+  opts($("#f-agency"),uniq(DATA.map(r=>r.agency)).sort());
+  opts($("#f-region"),REGION_ORDER.filter(r=>DATA.some(d=>(d.regions||"").includes(r))));
+  opts($("#f-food"),uniq(DATA.map(r=>r.food_type)).sort());
+  opts($("#f-hazard"),uniq(DATA.map(r=>r.hazard_category)).sort());
+  opts($("#f-class"),CLASS_ORDER.filter(c=>DATA.some(d=>d.classification===c)));
+}
+function filtered(){
+  const a=$("#f-agency").value,rg=$("#f-region").value,fd=$("#f-food").value,
+    hz=$("#f-hazard").value,cl=$("#f-class").value,q=$("#f-q").value.trim().toLowerCase(),
+    ss=$("#btn-sample").checked;
+  let rows=DATA.filter(r=>{
+    if(!ss&&r.is_sample==="Yes") return false;
+    if(a&&r.agency!==a) return false;
+    if(rg&&!(r.regions||"").includes(rg)) return false;
+    if(fd&&r.food_type!==fd) return false;
+    if(hz&&r.hazard_category!==hz) return false;
+    if(cl&&r.classification!==cl) return false;
+    if(q){const h=(r.firm+" "+r.product_description+" "+r.reason+" "+r.agent).toLowerCase(); if(!h.includes(q)) return false;}
+    return true;
+  });
+  rows.sort((x,y)=>{const vx=x[sortKey]||"",vy=y[sortKey]||"";return (vx<vy?-1:vx>vy?1:0)*sortDir;});
+  return rows;
+}
+function kpis(rows){
+  const c1=rows.filter(r=>r.classification==="Class I").length;
+  const ongoing=rows.filter(r=>/ongoing|active|open|progress/i.test(r.status)).length;
+  const fda=rows.filter(r=>r.agency==="FDA").length;
+  const hz={}; rows.forEach(r=>hz[r.hazard_category]=(hz[r.hazard_category]||0)+1);
+  const top=Object.entries(hz).sort((a,b)=>b[1]-a[1])[0];
+  const cards=[["",rows.length,"Recalls (filtered)"],["sev",c1,"Class I (serious)"],
+    ["",ongoing,"Ongoing / active"],["",fda+" / "+(rows.length-fda),"FDA / USDA"]];
+  $("#kpis").innerHTML=cards.map(([c,n,l])=>`<div class="kpi ${c}"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
+}
+function monthsIn(rows){ return uniq(rows.map(r=>r.year&&r.month?`${r.year}-${r.month}`:"")).sort(); }
+function trend(rows){
+  const months=monthsIn(rows), host=$("#trend");
+  if(!months.length){host.innerHTML='<div class="empty">No dated recalls in view.</div>';$("#trend-legend").innerHTML="";return;}
+  const counts=months.map(m=>{const o={m};CLASS_ORDER.forEach(c=>o[c]=0);
+    rows.forEach(r=>{if(`${r.year}-${r.month}`===m&&(r.classification in o))o[r.classification]++;});
+    o.total=CLASS_ORDER.reduce((s,c)=>s+o[c],0);return o;});
+  const maxV=Math.max(1,...counts.map(c=>c.total));
+  const AX=40,H=280,padT=14,padB=48;
+  const avail=Math.max(240,(host.clientWidth||340));
+  const colW=Math.max(42,Math.floor((avail-AX-4)/months.length));
+  const W=colW*months.length, plotH=H-padT-padB, bw=Math.min(28,colW*0.6);
+  const x=i=>i*colW+colW/2, y=v=>padT+plotH*(1-v/maxV);
+  const ticks=Math.min(maxV,5);
+  let axis="";
+  for(let t=0;t<=ticks;t++){const v=Math.round(maxV*t/ticks);
+    axis+=`<line x1="${AX-4}" x2="${AX}" y1="${y(v)}" y2="${y(v)}" class="axis"/><text x="${AX-7}" y="${y(v)+3}" text-anchor="end">${v}</text>`;}
+  let grid="";
+  for(let t=0;t<=ticks;t++){const v=Math.round(maxV*t/ticks); grid+=`<line x1="0" x2="${W}" y1="${y(v)}" y2="${y(v)}" class="axis"/>`;}
+  let bars="",years="",lastYear=null;
+  counts.forEach((c,i)=>{
+    const yr=c.m.slice(0,4);
+    if(yr!==lastYear){const lx=x(i)-colW/2;
+      years+=`<line x1="${lx}" x2="${lx}" y1="${padT}" y2="${padT+plotH+6}" stroke="#C7D0D8"/><text x="${lx+3}" y="${H-padB+31}" text-anchor="start" fill="#16202A" style="font-weight:600">${yr}</text>`;
+      lastYear=yr;}
+    let acc=0;
+    CLASS_ORDER.forEach(cl=>{const v=c[cl];if(!v)return;
+      const h=plotH*v/maxV,yy=padT+plotH*(1-(acc+v)/maxV);
+      bars+=`<rect x="${x(i)-bw/2}" y="${yy}" width="${bw}" height="${h}" fill="${CLASS_COLOR[cl]}"><title>${c.m} · ${cl}: ${v}</title></rect>`;acc+=v;});
+    bars+=`<text x="${x(i)}" y="${H-padB+14}" text-anchor="middle">${c.m.slice(5)}</text>`;
+    if(c.total) bars+=`<text x="${x(i)}" y="${y(c.total)-4}" text-anchor="middle" fill="#16202A">${c.total}</text>`;});
+  let marks="";
+  POLICY.forEach(p=>{const idx=months.indexOf((p.date||"").slice(0,7)); if(idx>=0){const xx=x(idx);
+    marks+=`<line x1="${xx}" x2="${xx}" y1="${padT}" y2="${padT+plotH}" stroke="#16202A" stroke-dasharray="3 3" opacity=".5"/><polygon points="${xx-4},${padT} ${xx+4},${padT} ${xx},${padT+7}" fill="#16202A"><title>${p.date} — ${p.title}</title></polygon>`;}});
+  host.innerHTML=`<div class="trend-scroll-wrap"><svg class="trend-axis" width="${AX}" height="${H}" aria-hidden="true">${axis}</svg>`
+    +`<div class="trend-scroll"><svg width="${W}" height="${H}" role="img" aria-label="Recalls per month by class">${grid}${years}${bars}${marks}</svg></div></div>`;
+  $("#trend-legend").innerHTML=CLASS_ORDER.map(c=>`<span><i style="background:${CLASS_COLOR[c]}"></i>${c}</span>`).join("")+`<span><i style="background:#16202A"></i>policy event</span>`+(W>avail-AX?`<span style="color:#0F5C6E">scroll →</span>`:"");
+}
+function stackedBars(host,entries,max){
+  host.innerHTML=entries.map(e=>{
+    const segs=CLASS_ORDER.map(c=>{const v=e.seg[c]||0;
+      return v?`<i style="width:${100*v/e.total}%;background:${CLASS_COLOR[c]}" title="${c}: ${v}"></i>`:"";}).join("");
+    return `<div class="bar-row"><div class="name" title="${e.name}">${e.name}</div><div class="bar-track"><div class="stack" style="width:${100*e.total/max}%">${segs}</div></div><div class="v">${e.total}</div></div>`;
+  }).join("")||'<div class="empty" style="padding:12px">None</div>';
+}
+function regionBars(rows){const m={};REGION_ORDER.forEach(r=>m[r]={name:r,total:0,seg:{}});
+  rows.forEach(r=>{const cls=r.classification;(r.regions||"").split(",").map(s=>s.trim()).forEach(s=>{if(!(s in m))return;m[s].total++;m[s].seg[cls]=(m[s].seg[cls]||0)+1;});});
+  const arr=REGION_ORDER.map(r=>m[r]).filter(e=>e.total);
+  stackedBars($("#region-bars"),arr,Math.max(1,...arr.map(e=>e.total)));}
+function hazardBars(rows){const m={};rows.forEach(r=>{const h=r.hazard_category||"Unspecified";(m[h]=m[h]||{name:h,total:0,seg:{}});m[h].total++;m[h].seg[r.classification]=(m[h].seg[r.classification]||0)+1;});
+  const arr=Object.values(m).sort((a,b)=>b.total-a.total);
+  stackedBars($("#hazard-bars"),arr,Math.max(1,...arr.map(e=>e.total)));}
+function drawBarsLegend(){$("#bars-legend").innerHTML=CLASS_ORDER.map(c=>`<span><i style="background:${CLASS_COLOR[c]}"></i>${c}</span>`).join("");}
+function illnessFor(r){return ILLNESS[r.agent]||(r.hazard_category==="Undeclared allergen"?ILLNESS["Undeclared allergen"]:null)||(r.hazard_category==="Foreign material"?ILLNESS["Foreign material"]:null);}
+function esc(s){return (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));}
+function table(){
+  const rows=tableRows, host=$("#rows");
+  $("#count").textContent=rows.length? `Showing ${Math.min(shown,rows.length).toLocaleString()} of ${rows.length.toLocaleString()} recalls`:"0 recalls";
+  if(!rows.length){host.innerHTML='<div class="empty">No recalls match these filters.</div>';$("#tablefoot").innerHTML="";return;}
+  host.innerHTML=rows.slice(0,shown).map(r=>{
+    const col=CLASS_COLOR[r.classification]||"#5A6B7B", agc=r.agency==="FDA"?"fda":"usda";
+    const ill=illnessFor(r), ongoing=/ongoing|active|open|progress/i.test(r.status);
+    const days=r.days_open!==""&&r.days_open!=null?`${r.days_open} days${r.date_closed?"":" (open)"}`:"—";
+    const illB=ill?`<div class="illness"><div class="h">If ${esc(r.agent||r.hazard_category)} — what it can cause</div><b>${esc(ill.illness)}.</b> ${esc(ill.symptoms)}<div style="margin-top:4px;color:var(--muted)">Onset ${esc(ill.onset)} · Higher risk: ${esc(ill.higher_risk)}</div></div>`:"";
+    return `<div class="rowc"><div class="rtop" onclick="this.parentNode.classList.toggle('open')">
+      <div class="spine" style="background:${col}"></div>
+      <div class="rmid">
+        <div class="rmeta"><span class="chip ${agc}">${r.agency}</span><span>${r.date_reported||"—"}</span><span>${esc(r.regions)}</span></div>
+        <div class="firm">${esc(r.firm)||"—"}</div>
+        <div class="prod">${esc(r.product_description)}</div>
+      </div>
+      <div class="cls" style="color:${col}">${(r.classification||"—").replace(" (USDA)","")}</div>
+    </div>
+    <div class="detail">
+      <dl>
+        <dt>Recall #</dt><dd>${esc(r.recall_number)||"—"} ${r.is_sample==="Yes"?'<span class="flag">sample</span>':""}</dd>
+        <dt>Reason</dt><dd>${esc(r.reason)||"—"}</dd>
+        <dt>Hazard</dt><dd>${esc(r.hazard_category)}${r.agent?" · "+esc(r.agent):""}</dd>
+        <dt>Status</dt><dd><span class="spill ${ongoing?"on":""}">${esc(r.status)||"—"}</span> &nbsp;${days}</dd>
+        <dt>Distribution</dt><dd>${esc(r.distribution_pattern)||"—"}${r.nationwide==="Yes"?" · Nationwide":""}</dd>
+        <dt>Quantity</dt><dd>${esc(r.quantity_raw)||"—"}</dd>
+        ${r.url?`<dt>Source</dt><dd><a href="${r.url}" target="_blank" rel="noopener">Agency recall page ↗</a></dd>`:""}
+      </dl>${illB}
+    </div></div>`;}).join("");
+  const remaining=rows.length-shown;
+  $("#tablefoot").innerHTML = remaining>0 ?
+    `<button class="ghost" id="more-btn">Show ${Math.min(PAGE,remaining)} more</button>`
+    +`<button class="ghost" id="all-btn">Show all ${rows.length.toLocaleString()}</button>` : "";
+  if(remaining>0){$("#more-btn").onclick=()=>{shown+=PAGE;table();};$("#all-btn").onclick=()=>{shown=rows.length;table();};}
+}
+function policy(){
+  $("#policy").innerHTML=POLICY.map(p=>{const conf=(p.effect_on_recalls||"").includes("CONFOUNDER");
+    return `<div class="pol-item"><div class="pol-date">${p.date}</div><div><div class="pol-title">${esc(p.title)}</div><div class="pol-sum">${esc(p.summary)}</div><div class="pol-eff">${conf?'<span class="flag">confounder</span>':""}${esc(p.effect_on_recalls)}</div><div class="conf">confidence: ${esc(p.confidence)} · ${esc(p.source)}</div></div></div>`;}).join("");
+}
+function render(){const rows=filtered();tableRows=rows;shown=PAGE;kpis(rows);trend(rows);regionBars(rows);hazardBars(rows);table();}
+
+/* ---------- wire up ---------- */
+(function initYears(){const now=new Date().getFullYear();const sel=$("#year");
+  for(let y=now;y>=2022;y--){const o=document.createElement("option");o.value=y;o.textContent=y;sel.appendChild(o);} sel.value=now;})();
+["f-agency","f-region","f-food","f-hazard","f-class"].forEach(id=>$("#"+id).addEventListener("change",render));
+$("#f-q").addEventListener("input",render);
+$("#btn-sample").addEventListener("change",render);
+$("#year").addEventListener("change",refresh);
+$("#btn-refresh").addEventListener("click",refresh);
+$("#btn-filters").addEventListener("click",()=>$("#filters").classList.toggle("open"));
+$("#btn-reset").addEventListener("click",()=>{["f-agency","f-region","f-food","f-hazard","f-class"].forEach(id=>$("#"+id).value="");$("#f-q").value="";$("#btn-sample").checked=true;render();});
+$("#btn-export").addEventListener("click",()=>{const rows=filtered();const cols=Object.keys(DATA[0]||{recall_id:1});
+  const csv=[cols.join(",")].concat(rows.map(r=>cols.map(c=>{let v=(r[c]??"").toString().replace(/"/g,'""');return /[",\n]/.test(v)?`"${v}"`:v;}).join(","))).join("\n");
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="recalls_filtered.csv";a.click();});
+$("#btn-load").addEventListener("click",()=>$("#file").click());
+$("#file").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();
+  rd.onload=()=>{try{let arr=f.name.endsWith(".json")?JSON.parse(rd.result):parseCSV(rd.result);
+    if(!Array.isArray(arr)||!arr.length)throw new Error("empty");DATA=arr;$("#btn-sample").checked=true;
+    banner();populate();render();alert("Loaded "+arr.length+" records from "+f.name);}
+    catch(err){alert("Could not read that file: "+err.message);}};rd.readAsText(f);});
+function parseCSV(text){const rows=[];let i=0,f="",row=[],q=false;
+  while(i<text.length){const c=text[i];
+    if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;}
+    else{if(c==='"')q=true;else if(c===","){row.push(f);f="";}
+      else if(c==="\n"||c==="\r"){if(f!==""||row.length){row.push(f);f="";rows.push(row);row=[];}if(c==="\r"&&text[i+1]==="\n")i++;}
+      else f+=c;}i++;}
+  if(f!==""||row.length){row.push(f);rows.push(row);}
+  const head=rows.shift();return rows.map(r=>Object.fromEntries(head.map((h,j)=>[h,r[j]??""])));}
+
+// show Add-to-Home hint on iOS Safari tabs (not already installed)
+if(/iP(hone|ad|od)/.test(navigator.userAgent) && !navigator.standalone) $("#a2hs").classList.add("show");
+
+populate(); policy(); drawBarsLegend(); render();
+refresh();   // attempt live data on open; falls back to sample if blocked
+</script>
+</body>
+</html>
