@@ -6,7 +6,7 @@ REM  Use it any time you want to force an update, or if the runner is off.
 REM ===========================================================================
 
 REM --- EDIT THIS to the full path of your local clone of the repo ----------
-set "REPO=D:\path\to\recall-monitor"
+set "REPO=D:\Users\KMjos\Documents\GitHub\recall-monitor"
 REM ------------------------------------------------------------------------
 
 setlocal enabledelayedexpansion
