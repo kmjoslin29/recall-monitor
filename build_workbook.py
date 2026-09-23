@@ -40,13 +40,17 @@ MASTER = os.path.join("data", "recalls_master.csv")
 OUT = "Food_Recall_Tracker.xlsx"
 
 # palette
-INK = "1F2933"
-SLATE = "334155"
-PAPER = "F8FAFC"
-BAND = "EEF2F7"
-CLASS1 = "F9D7D2"        # light red for Class I severity cue
-CLASS1_TXT = "9B1C0F"
-ACCENT = "0F5C6E"        # teal
+# Palette aligned to the dashboards' Material 3 light scheme (seed #0F5C6E,
+# generated with material-color-utilities). M3 governs screen UI, not Excel,
+# so only colors are shared; fonts/layout stay spreadsheet-native.
+INK = "171C1E"           # on-surface
+SLATE = "00677C"         # primary (header fill; white text = 6.5:1)
+PAPER = "F5FAFD"         # surface
+BAND = "EFF4F7"          # surface-container-low
+CLASS1 = "FFDAD4"        # Class I severity container
+CLASS1_TXT = "900E00"    # on Class I container
+ACCENT = "00677C"        # primary
+WARN_FILL = "FFDCBD"     # confounder highlight (warn container)
 
 FONT = "Arial"
 H = Font(name=FONT, bold=True, color="FFFFFF", size=11)
@@ -422,7 +426,7 @@ def sheet_policy(wb):
             c.alignment = WRAP
             c.border = BORDER
         if "CONFOUNDER" in e["effect_on_recalls"]:
-            ws.cell(rr, 4).fill = PatternFill("solid", fgColor="FFF3C4")
+            ws.cell(rr, 4).fill = PatternFill("solid", fgColor=WARN_FILL)
     return ws
 
 

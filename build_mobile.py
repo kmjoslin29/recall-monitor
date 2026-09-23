@@ -41,15 +41,15 @@ def make_icon():
     S = 512
     img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    d.rounded_rectangle([0, 0, S, S], radius=112, fill=(22, 32, 42, 255))   # slate
-    d.rounded_rectangle([70, 60, 120, S - 60], radius=22, fill=(200, 53, 31, 255))  # red spine
+    d.rounded_rectangle([0, 0, S, S], radius=112, fill=(0, 103, 124, 255))   # M3 primary #00677c
+    d.rounded_rectangle([70, 60, 120, S - 60], radius=22, fill=(255, 218, 212, 255))  # sev-c1 container
     # magnifier lens
     cx, cy, r = 300, 232, 120
     d.ellipse([cx - r, cy - r, cx + r, cy + r], outline=(255, 255, 255, 255), width=34)
     d.line([cx + r - 24, cy + r - 24, 430, 372], fill=(255, 255, 255, 255), width=40)
     # teal check inside lens
-    d.line([cx - 52, cy + 6, cx - 14, cy + 46], fill=(18, 121, 143, 255), width=30)
-    d.line([cx - 14, cy + 46, cx + 60, cy - 44], fill=(18, 121, 143, 255), width=30)
+    d.line([cx - 52, cy + 6, cx - 14, cy + 46], fill=(178, 235, 255, 255), width=30)
+    d.line([cx - 14, cy + 46, cx + 60, cy - 44], fill=(178, 235, 255, 255), width=30)
     buf = io.BytesIO()
     img.save(buf, format="PNG")
     return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
@@ -78,210 +78,344 @@ TEMPLATE = r"""<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Recall Monitor</title>
-<meta name="theme-color" content="#16202A">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f5fafd">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1416">
+<meta name="color-scheme" content="light dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Recalls">
 <link rel="apple-touch-icon" href="__ICON__">
 <link rel="icon" href="__ICON__">
-<link rel="manifest" href='data:application/json,{"name":"US Food Recall Monitor","short_name":"Recalls","display":"standalone","background_color":"%23EEF1F4","theme_color":"%2316202A","icons":[{"src":"__ICON__","sizes":"512x512","type":"image/png"}]}'>
+<link rel="manifest" href='data:application/json,{"name":"US Food Recall Monitor","short_name":"Recalls","display":"standalone","background_color":"%23f5fafd","theme_color":"%2300677c","icons":[{"src":"__ICON__","sizes":"512x512","type":"image/png"}]}'>
 <style>
+/* ===== Material Design 3 system tokens =====================================
+   Color: generated with Google's material-color-utilities (SchemeTonalSpot),
+   seed #0F5C6E. Shape/state/type/motion values from material-web
+   tokens/versions/latest. Severity colors are data-viz roles built as M3 tonal
+   palettes (tone 45 light / 75 dark), deliberately NOT harmonized to the seed
+   so their red/amber/teal/violet meaning is preserved. */
 :root{
-  --paper:#EEF1F4;--panel:#FFF;--ink:#16202A;--muted:#5A6B7B;--line:#D6DEE5;
-  --line2:#E7ECF1;--c1:#C8351F;--c2:#DE8A1E;--c3:#4A7A8C;--pha:#7A5CA6;
-  --accent:#0F5C6E;--ok:#1c7d53;--warn:#8a5a12;
-  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
-  --sans:-apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color-scheme:light dark;
+  --md-primary:#00677c;--md-on-primary:#ffffff;
+  --md-primary-container:#b2ebff;--md-on-primary-container:#004e5e;
+  --md-secondary:#4b626a;--md-secondary-container:#cee7f0;--md-on-secondary-container:#344a51;
+  --md-tertiary-container:#dfe0ff;--md-on-tertiary-container:#404465;
+  --md-error:#ba1a1a;--md-error-container:#ffdad6;--md-on-error-container:#93000a;
+  --md-surface:#f5fafd;--md-on-surface:#171c1e;--md-on-surface-variant:#40484b;
+  --md-surface-container-lowest:#ffffff;--md-surface-container-low:#eff4f7;
+  --md-surface-container:#eaeff1;--md-surface-container-high:#e4e9eb;
+  --md-surface-container-highest:#dee3e6;
+  --md-outline:#70787c;--md-outline-variant:#bfc8cc;
+  --sev-c1:#c6341e;--sev-c2:#9b5c00;--sev-c3:#417183;--sev-pha:#7a5ca6;
+  --sev-c1-container:#ffdad4;--warn-container:#ffdcbd;--on-warn-container:#693c00;
+  /* shape */
+  --md-shape-xs:4px;--md-shape-sm:8px;--md-shape-md:12px;--md-shape-lg:16px;
+  --md-shape-xl:28px;--md-shape-full:9999px;
+  /* state layers */
+  --md-state-hover:.08;--md-state-focus:.10;--md-state-pressed:.10;
+  /* motion */
+  --md-ease-standard:cubic-bezier(0.2,0,0,1);--md-dur-short4:200ms;
+  /* type — Roboto is the M3 baseline typeface; system fallbacks keep the
+     file offline/self-contained (no webfont download). */
+  --md-font:Roboto,"Google Sans Text",system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  --md-font-mono:"Roboto Mono",ui-monospace,"Cascadia Mono",Consolas,Menlo,monospace;
 }
+@media (prefers-color-scheme:dark){:root{
+  --md-primary:#86d1e9;--md-on-primary:#003642;
+  --md-primary-container:#004e5e;--md-on-primary-container:#b2ebff;
+  --md-secondary:#b2cad3;--md-secondary-container:#344a51;--md-on-secondary-container:#cee7f0;
+  --md-tertiary-container:#404465;--md-on-tertiary-container:#dfe0ff;
+  --md-error:#ffb4ab;--md-error-container:#93000a;--md-on-error-container:#ffdad6;
+  --md-surface:#0f1416;--md-on-surface:#dee3e6;--md-on-surface-variant:#bfc8cc;
+  --md-surface-container-lowest:#090f11;--md-surface-container-low:#171c1e;
+  --md-surface-container:#1b2022;--md-surface-container-high:#252b2d;
+  --md-surface-container-highest:#303638;
+  --md-outline:#899296;--md-outline-variant:#40484b;
+  --sev-c1:#ffa08e;--sev-c2:#ffa53a;--sev-c3:#90c0d4;--sev-pha:#cbaafa;
+  --sev-c1-container:#900e00;--warn-container:#693c00;--on-warn-container:#ffdcbd;
+}}
+
+/* ===== type scale (material-web tokens, rem) ============================== */
+.t-headline-s{font-size:1.5rem;line-height:2rem;font-weight:400}
+.t-headline-m{font-size:1.75rem;line-height:2.25rem;font-weight:400}
+.t-title-l{font-size:1.375rem;line-height:1.75rem;font-weight:400}
+.t-title-m{font-size:1rem;line-height:1.5rem;font-weight:500;letter-spacing:.009375rem}
+.t-title-s{font-size:.875rem;line-height:1.25rem;font-weight:500;letter-spacing:.00625rem}
+.t-label-l{font-size:.875rem;line-height:1.25rem;font-weight:500;letter-spacing:.00625rem}
+.t-label-m{font-size:.75rem;line-height:1rem;font-weight:500;letter-spacing:.03125rem}
+.t-label-s{font-size:.6875rem;line-height:1rem;font-weight:500;letter-spacing:.03125rem}
+.t-body-l{font-size:1rem;line-height:1.5rem;letter-spacing:.03125rem}
+.t-body-m{font-size:.875rem;line-height:1.25rem;letter-spacing:.015625rem}
+.t-body-s{font-size:.75rem;line-height:1rem;letter-spacing:.025rem}
+
+/* ===== base =============================================================== */
 *{box-sizing:border-box}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
-  font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%;
-  padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
-.wrap{max-width:760px;margin:0 auto;padding:0 14px 72px}
-a{color:var(--accent)}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--md-surface);color:var(--md-on-surface);
+  font-family:var(--md-font);font-size:.875rem;line-height:1.25rem;
+  letter-spacing:.015625rem;-webkit-font-smoothing:antialiased}
+a{color:var(--md-primary)}
+code{font-family:var(--md-font-mono);font-size:.8125rem}
+.num{font-variant-numeric:tabular-nums}
 
-header.mast{padding:16px 0 12px;border-bottom:2px solid var(--ink);margin-bottom:14px}
-.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;
-  text-transform:uppercase;color:var(--accent);margin:0 0 5px}
-h1{font-size:24px;line-height:1.05;margin:0;font-weight:800;letter-spacing:-.01em}
-.srcline{display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:10px;align-items:center}
-.pill{font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:20px;
-  border:1px solid var(--line);color:var(--muted);white-space:nowrap}
-.pill.live{color:var(--ok);border-color:#accdb9;background:#eef7f1}
-.pill.warnp{color:var(--warn);border-color:#e3c38a;background:#fdf6e9}
-.pill.sample{color:#7d1c10;border-color:#e6a79c;background:#fdecea}
-.updated{font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:auto}
+/* focus indicator: 3px ring, 2px outer offset, secondary (md.sys.state.focus-indicator) */
+:focus-visible{outline:3px solid var(--md-secondary);outline-offset:2px}
 
-.banner{border-radius:8px;padding:9px 12px;font-size:12.5px;margin-bottom:12px;display:none}
-.banner.show{display:block}
-.banner.warn{background:#fdf6e9;border:1px solid #e3c38a;color:#6b4708}
-.banner.sample{background:#fdecea;border:1px solid var(--c1);color:#7d1c10}
+/* state layer: currentColor overlay at M3 opacities */
+.sl{position:relative;isolation:isolate}
+.sl::before{content:"";position:absolute;inset:0;border-radius:inherit;
+  background:currentColor;opacity:0;pointer-events:none;z-index:-1;
+  transition:opacity var(--md-dur-short4) var(--md-ease-standard)}
+.sl:hover::before{opacity:var(--md-state-hover)}
+.sl:focus-visible::before{opacity:var(--md-state-focus)}
+.sl:active::before{opacity:var(--md-state-pressed)}
 
-.controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:center}
-.controls .grow{flex:1 1 100%}
-button{font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;
-  border:1px solid var(--accent);background:var(--accent);color:#fff;
-  padding:10px 14px;border-radius:9px;min-height:44px}
-button.ghost{background:#fff;color:var(--accent)}
-button:active{transform:translateY(1px)}
-select,input[type=search]{font-family:var(--sans);font-size:15px;padding:9px 10px;
-  border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);
-  min-height:44px;width:100%}
-input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-.filt-toggle{background:#fff;color:var(--ink);border:1px solid var(--line)}
-.filters{display:none;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.filters.open{display:grid}
-.filters .full{grid-column:1/-1}
-.fld{display:flex;flex-direction:column;gap:3px}
-.fld label{font-size:10px;text-transform:uppercase;letter-spacing:.07em;
-  color:var(--muted);font-weight:700}
-.rowbtns{display:flex;gap:8px;flex-wrap:wrap}
-.toggle{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);
-  min-height:44px}
-.toggle input{width:20px;height:20px}
+/* ===== buttons (button-small: 40px container, full corner, 48px target) === */
+.btn{font:inherit;font-size:.875rem;line-height:1.25rem;font-weight:500;
+  letter-spacing:.00625rem;height:40px;padding:0 16px;border-radius:var(--md-shape-full);
+  border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+  gap:8px;white-space:nowrap}
+.btn::after{content:"";position:absolute;left:0;right:0;top:-4px;bottom:-4px}  /* 48px target */
+.btn.filled{background:var(--md-primary);color:var(--md-on-primary)}
+.btn.tonal{background:var(--md-secondary-container);color:var(--md-on-secondary-container)}
+.btn.outlined{background:transparent;color:var(--md-primary);border:1px solid var(--md-outline-variant)}
+.btn.text{background:transparent;color:var(--md-primary);padding:0 12px}
+.btn[disabled]{opacity:.38;cursor:default}
+.btn svg{width:20px;height:20px;fill:currentColor}
 
-.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;
-  padding:11px 13px;position:relative;overflow:hidden}
-.kpi .n{font-family:var(--mono);font-size:23px;font-weight:700;line-height:1}
-.kpi .l{font-size:11px;color:var(--muted);text-transform:uppercase;
-  letter-spacing:.06em;margin-top:5px}
-.kpi.sev::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c1)}
+/* ===== filter chip (32px, small corner, 48px target) ====================== */
+.fchip{position:relative;display:inline-flex;cursor:pointer}
+.fchip input{position:absolute;opacity:0;width:1px;height:1px}
+.fchip-body{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 16px;
+  border-radius:var(--md-shape-sm);border:1px solid var(--md-outline-variant);
+  color:var(--md-on-surface-variant);font-size:.875rem;font-weight:500;letter-spacing:.00625rem}
+.fchip-body::after{content:"";position:absolute;left:0;right:0;top:-8px;bottom:-8px}
+.fchip-body svg{width:18px;height:18px;fill:currentColor;display:none}
+.fchip input:checked + .fchip-body{background:var(--md-secondary-container);
+  color:var(--md-on-secondary-container);border-color:transparent;padding-left:8px}
+.fchip input:checked + .fchip-body svg{display:block}
+.fchip input:focus-visible + .fchip-body{outline:3px solid var(--md-secondary);outline-offset:2px}
 
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;
-  padding:14px;margin-bottom:14px;min-width:0}
-.panel h2{font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;
-  color:var(--muted);margin:0 0 10px;font-weight:700}
-.legend{display:flex;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;
-  color:var(--muted);margin-top:8px}
-.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px}
-.bars{display:flex;flex-direction:column;gap:7px}
-.bar-row{display:grid;grid-template-columns:96px 1fr 30px;align-items:center;gap:8px}
-.bar-row .name{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bar-track{background:var(--line2);border-radius:3px;height:15px;overflow:hidden}
-.stack{height:100%;display:flex;border-radius:3px;overflow:hidden}
+/* ===== outlined select / search bar ======================================= */
+.fld{display:flex;flex-direction:column;gap:4px;min-width:0}
+.fld > label{font-size:.75rem;line-height:1rem;font-weight:500;letter-spacing:.03125rem;
+  color:var(--md-on-surface-variant);padding-left:4px}
+.select{font:inherit;font-size:1rem;line-height:1.5rem;height:56px;padding:0 40px 0 16px;
+  border:1px solid var(--md-outline);border-radius:var(--md-shape-xs);
+  background:var(--md-surface) no-repeat right 12px center/24px 24px;
+  color:var(--md-on-surface);cursor:pointer;appearance:none;-webkit-appearance:none;width:100%;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2370787c' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")}
+.select:hover{border-color:var(--md-on-surface)}
+.select:focus-visible{outline:none;border:2px solid var(--md-primary);padding-left:15px}
+.search{display:flex;align-items:center;gap:4px;height:56px;padding:0 16px 0 16px;
+  border-radius:var(--md-shape-full);background:var(--md-surface-container-high);
+  color:var(--md-on-surface-variant)}
+.search svg{width:24px;height:24px;fill:currentColor;flex:0 0 auto}
+.search input{flex:1;min-width:0;height:100%;border:0;background:transparent;
+  font:inherit;font-size:1rem;line-height:1.5rem;color:var(--md-on-surface);padding:0 8px}
+.search input::placeholder{color:var(--md-on-surface-variant)}
+.search input:focus-visible{outline:none}
+.search:focus-within{outline:3px solid var(--md-secondary);outline-offset:2px}
+
+/* ===== cards (outlined: medium corner, 1px outline-variant) =============== */
+.card{background:var(--md-surface);border:1px solid var(--md-outline-variant);
+  border-radius:var(--md-shape-md);padding:16px;min-width:0}
+.card-filled{background:var(--md-surface-container-highest);border-radius:var(--md-shape-md);padding:16px}
+.card h2{margin:0 0 12px;font-size:1rem;line-height:1.5rem;font-weight:500;
+  letter-spacing:.009375rem;color:var(--md-on-surface)}
+.card h2 .sub{display:block;font-size:.75rem;line-height:1rem;font-weight:400;
+  letter-spacing:.025rem;color:var(--md-on-surface-variant)}
+
+/* static labels (non-interactive; chip-shaped — see README M3 deviations) */
+.tag{display:inline-flex;align-items:center;height:24px;padding:0 8px;
+  border-radius:var(--md-shape-sm);font-size:.6875rem;line-height:1rem;font-weight:500;
+  letter-spacing:.03125rem;white-space:nowrap}
+.tag.fda{background:var(--md-primary-container);color:var(--md-on-primary-container)}
+.tag.usda{background:var(--md-tertiary-container);color:var(--md-on-tertiary-container)}
+.tag.warn{background:var(--warn-container);color:var(--on-warn-container)}
+.tag.outline{border:1px solid var(--md-outline-variant);color:var(--md-on-surface-variant)}
+.tag.on{background:var(--warn-container);color:var(--on-warn-container)}
+.tag.live{background:var(--md-primary-container);color:var(--md-on-primary-container)}
+.tag.sample{background:var(--md-error-container);color:var(--md-on-error-container)}
+
+/* notice (filled card in error/secondary containers; M3 has no banner) */
+.notice{border-radius:var(--md-shape-md);padding:12px 16px;font-size:.875rem;line-height:1.25rem}
+.notice.error{background:var(--md-error-container);color:var(--md-on-error-container)}
+.notice.warn{background:var(--warn-container);color:var(--on-warn-container)}
+.notice.info{background:var(--md-secondary-container);color:var(--md-on-secondary-container)}
+
+/* ===== data viz =========================================================== */
+.legend{display:flex;gap:4px 16px;flex-wrap:wrap;font-size:.75rem;line-height:1rem;
+  color:var(--md-on-surface-variant);margin-top:12px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:var(--md-shape-xs);
+  margin-right:6px;vertical-align:-2px}
+.bars{display:flex;flex-direction:column;gap:8px}
+.bar-row{display:grid;grid-template-columns:132px 1fr 40px;align-items:center;gap:12px}
+.bar-row .name{font-size:.875rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{background:var(--md-surface-container-highest);border-radius:var(--md-shape-xs);
+  height:16px;overflow:hidden}
+.stack{height:100%;display:flex;overflow:hidden;border-radius:var(--md-shape-xs)}
 .stack i{display:block;height:100%}
-.tablefoot{display:flex;gap:8px;align-items:center;padding:12px;border-top:1px solid var(--line2);flex-wrap:wrap}
-.tablefoot:empty{display:none}
-.bar-fill{height:100%;background:var(--accent);border-radius:3px}
-.bar-row .v{font-family:var(--mono);font-size:12px;text-align:right;color:var(--muted)}
-
-.tablewrap{background:var(--panel);border:1px solid var(--line);border-radius:10px;
-  overflow:hidden;margin-bottom:14px}
-.rowc{border-bottom:1px solid var(--line2)}
-.rtop{display:grid;grid-template-columns:6px 1fr auto;gap:10px;padding:11px 12px;
-  align-items:center;cursor:pointer}
-.rowc:active{background:#f5f8fa}
-.spine{width:6px;height:38px;border-radius:2px;background:var(--muted)}
-.rmid{min-width:0}
-.rmeta{font-family:var(--mono);font-size:10.5px;color:var(--muted);
-  display:flex;gap:8px;margin-bottom:2px}
-.chip{font-weight:700;padding:1px 5px;border-radius:4px}
-.chip.fda{background:#e4f0f3;color:#0d4f5e}.chip.usda{background:#efe9f6;color:#5a3f86}
-.firm{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.prod{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cls{font-family:var(--mono);font-size:10.5px;font-weight:700;text-align:right;white-space:nowrap}
-.detail{display:none;padding:0 12px 14px 28px;background:#fbfcfd}
-.rowc.open .detail{display:block}
-.detail dl{display:grid;grid-template-columns:104px 1fr;gap:4px 10px;margin:8px 0}
-.detail dt{font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700}
-.detail dd{margin:0;font-size:13.5px}
-.illness{background:#fff;border:1px solid var(--line);border-left:3px solid var(--c1);
-  border-radius:8px;padding:9px 11px;margin-top:8px}
-.illness .h{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;
-  letter-spacing:.06em;color:var(--c1);font-weight:700;margin-bottom:3px}
-.spill{font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:10px;
-  border:1px solid var(--line)}
-.spill.on{color:#8a5a12;border-color:#e3c38a;background:#fdf6e9}
-.empty{padding:34px 14px;text-align:center;color:var(--muted)}
-.count{font-family:var(--mono);font-size:11px;color:var(--muted);margin:2px 2px 8px}
-
-svg text{font-family:var(--mono);font-size:10px;fill:var(--muted)}
-.axis line{stroke:var(--line)}
+.stack i + i{box-shadow:-1px 0 0 var(--md-surface)}
+.bar-row .v{font-variant-numeric:tabular-nums;font-size:.875rem;text-align:right;
+  color:var(--md-on-surface-variant)}
 .trend-scroll-wrap{display:flex;align-items:flex-start}
 .trend-axis{flex:0 0 auto}
 .trend-scroll{overflow-x:auto;overflow-y:hidden;flex:1 1 auto;min-width:0;
   -webkit-overflow-scrolling:touch;scrollbar-width:thin}
 .trend-scroll svg{display:block}
+svg text{font-family:var(--md-font);font-size:11px;fill:var(--md-on-surface-variant);
+  font-variant-numeric:tabular-nums}
+.axis{stroke:var(--md-outline-variant)}
+.empty{padding:40px 16px;text-align:center;color:var(--md-on-surface-variant)}
 
-.pol-item{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:9px 0;border-top:1px solid var(--line2)}
-.pol-date{font-family:var(--mono);font-size:11.5px;color:var(--accent);font-weight:700}
-.pol-title{font-weight:700;font-size:13px}
-.pol-sum{font-size:12px;color:var(--muted);margin-top:2px}
-.pol-eff{font-size:12px;margin-top:3px}
-.flag{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:700;
-  color:#8a5a12;background:#fdf6e9;border:1px solid #e3c38a;border-radius:4px;padding:1px 5px;margin-right:5px}
-.conf{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px}
+/* ===== expandable list ==================================================== */
+.list{background:var(--md-surface);border:1px solid var(--md-outline-variant);
+  border-radius:var(--md-shape-lg);overflow:hidden}
+.row{border-bottom:1px solid var(--md-outline-variant)}
+.row:last-child{border-bottom:0}
+.rtop{cursor:pointer;color:var(--md-on-surface)}
+.spine{width:4px;align-self:stretch;border-radius:var(--md-shape-full);min-height:40px}
+.firm{font-size:1rem;line-height:1.5rem;letter-spacing:.03125rem;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.prod{font-size:.875rem;line-height:1.25rem;color:var(--md-on-surface-variant);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cls{font-size:.75rem;line-height:1rem;font-weight:500;letter-spacing:.03125rem;white-space:nowrap}
+.chev{width:24px;height:24px;fill:var(--md-on-surface-variant);flex:0 0 auto;
+  transition:transform var(--md-dur-short4) var(--md-ease-standard)}
+.row.open .chev{transform:rotate(180deg)}
+.detail{display:none;padding:8px 16px 16px 36px;background:var(--md-surface-container-low)}
+.row.open .detail{display:block}
+.detail dl{display:grid;grid-template-columns:140px 1fr;gap:8px 16px;margin:8px 0}
+.detail dt{font-size:.75rem;line-height:1rem;font-weight:500;letter-spacing:.03125rem;
+  color:var(--md-on-surface-variant);padding-top:2px}
+.detail dd{margin:0;font-size:.875rem;line-height:1.25rem}
+.illness{background:var(--md-surface);border:1px solid var(--md-outline-variant);
+  border-radius:var(--md-shape-md);padding:12px 16px;margin-top:8px}
+.illness .h{font-size:.75rem;line-height:1rem;font-weight:500;letter-spacing:.03125rem;
+  color:var(--sev-c1);margin-bottom:4px}
+.listfoot{display:flex;gap:8px;align-items:center;padding:16px;flex-wrap:wrap;
+  border-top:1px solid var(--md-outline-variant)}
+.listfoot:empty{display:none}
+.count{font-size:.875rem;color:var(--md-on-surface-variant);margin:24px 4px 8px}
 
-.a2hs{display:none;background:#fff;border:1px dashed var(--accent);border-radius:9px;
-  padding:9px 12px;font-size:12.5px;color:var(--accent);margin-bottom:14px}
-.a2hs.show{display:block}
-footer{margin-top:20px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
-footer ul{margin:8px 0 0;padding-left:18px}
-@media(min-width:560px){.kpis{grid-template-columns:repeat(4,1fr)}.filters{grid-template-columns:repeat(3,1fr)}}
-@media(prefers-reduced-motion:reduce){button:active{transform:none}}
+/* ===== policy list ======================================================== */
+.pol-item{display:grid;grid-template-columns:104px 1fr;gap:16px;padding:12px 0;
+  border-top:1px solid var(--md-outline-variant)}
+.pol-item:first-child{border-top:0}
+.pol-date{font-variant-numeric:tabular-nums;font-size:.875rem;font-weight:500;color:var(--md-primary)}
+.pol-title{font-size:1rem;line-height:1.5rem;font-weight:500}
+.pol-sum{font-size:.875rem;color:var(--md-on-surface-variant);margin-top:2px}
+.pol-eff{font-size:.875rem;margin-top:8px;display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap}
+.conf{font-size:.75rem;line-height:1rem;color:var(--md-on-surface-variant);margin-top:4px}
+footer{margin-top:32px;padding-top:16px;border-top:1px solid var(--md-outline-variant);
+  font-size:.875rem;color:var(--md-on-surface-variant)}
+footer ul{margin:8px 0 0;padding-left:20px}
+footer strong{color:var(--md-on-surface)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+
+/* ===== mobile layout (M3 compact window: 16dp margins) ==================== */
+body{padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
+.wrap{max-width:840px;margin:0 auto;padding:0 16px 72px}
+header.mast{padding:16px 0 8px}
+.overline{margin:0 0 4px;color:var(--md-primary)}
+h1{margin:0}
+.srcline{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
+.updated{font-size:.75rem;line-height:1rem;color:var(--md-on-surface-variant);margin-left:auto}
+.notice{margin:8px 0 16px;display:none}.notice.show{display:block}
+.controls{display:grid;grid-template-columns:minmax(96px,1fr) auto auto;gap:8px;align-items:end;margin:8px 0 16px}
+.controls .btn{margin-bottom:8px}   /* centers 40dp buttons on the 56dp field */
+.filters{display:none;background:var(--md-surface-container-low);border-radius:var(--md-shape-lg);
+  padding:16px;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.filters.open{display:grid}
+.filters .full{grid-column:1/-1}
+.rowbtns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.kpi .n{font-size:1.75rem;line-height:2.25rem;font-variant-numeric:tabular-nums}
+.kpi .l{font-size:.75rem;line-height:1rem;color:var(--md-on-surface-variant);margin-top:4px}
+.kpi.sev .n{color:var(--sev-c1)}
+.card{margin-bottom:16px}
+.bar-row{grid-template-columns:96px 1fr 36px;gap:8px}
+.rowc{border-bottom:1px solid var(--md-outline-variant)}
+.rowc:last-child{border-bottom:0}
+.rtop{display:grid;grid-template-columns:4px minmax(0,1fr) auto 24px;gap:12px;align-items:center;
+  padding:12px 16px;min-height:88px;cursor:pointer}                   /* three-line list item */
+.rmeta{display:flex;gap:8px;align-items:center;font-size:.75rem;line-height:1rem;
+  color:var(--md-on-surface-variant);margin-bottom:2px;min-width:0}
+.rmeta span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rowc.open .detail{display:block}
+.rowc.open .chev{transform:rotate(180deg)}
+.detail dl{grid-template-columns:104px 1fr}
+.detail{padding-left:16px}
+.pol-item{grid-template-columns:88px 1fr;gap:12px}
+.a2hs{display:none;margin-bottom:16px}.a2hs.show{display:block}
+@media (min-width:600px){.wrap{padding:0 24px 72px}.kpis{grid-template-columns:repeat(4,1fr)}
+  .filters{grid-template-columns:repeat(3,1fr)}}                     /* medium: 24dp */
+@media (max-width:379px){.detail dl{grid-template-columns:1fr}
+  .controls{grid-template-columns:1fr 1fr}.controls .fld{grid-column:1/-1}.controls .btn{margin-bottom:0}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="mast">
-    <p class="eyebrow">Food safety surveillance &middot; FDA + USDA</p>
-    <h1>US Food Recall Monitor</h1>
+    <p class="overline t-label-l">Food safety surveillance &middot; FDA + USDA</p>
+    <h1 class="t-headline-s">US Food Recall Monitor</h1>
     <div class="srcline" id="srcline">
-      <span class="pill" id="pill-fda">FDA —</span>
-      <span class="pill" id="pill-usda">USDA —</span>
+      <span class="tag outline" id="pill-fda">FDA —</span>
+      <span class="tag outline" id="pill-usda">USDA —</span>
       <span class="updated" id="updated"></span>
     </div>
   </header>
 
-  <div class="a2hs" id="a2hs">Tip: tap <b>Share → Add to Home Screen</b> to keep this as an app that refreshes on open.</div>
-  <div class="banner" id="banner"></div>
+  <div class="notice info a2hs" id="a2hs">Tip: tap <b>Share → Add to Home Screen</b> to keep this as an app that refreshes on open.</div>
+  <div class="notice" id="banner" role="status"></div>
 
   <div class="controls">
-    <button id="btn-refresh">↻ Refresh live data</button>
-    <div class="fld" style="width:120px"><label>Year</label><select id="year"></select></div>
-    <button class="filt-toggle" id="btn-filters">Filters</button>
+    <div class="fld"><label for="year">Year</label><select class="select" id="year"></select></div>
+    <button type="button" class="btn tonal sl" id="btn-filters" aria-expanded="false" aria-controls="filters"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg>Filters</button>
+    <button type="button" class="btn filled sl" id="btn-refresh"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.65 6.35A7.96 7.96 0 0 0 12 4a8 8 0 1 0 7.73 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>Refresh</button>
   </div>
 
-  <div class="filters" id="filters">
-    <div class="fld full"><label>Search firm / product</label>
-      <input type="search" id="f-q" placeholder="e.g. cheese, Listeria"></div>
-    <div class="fld"><label>Agency</label><select id="f-agency"></select></div>
-    <div class="fld"><label>Region</label><select id="f-region"></select></div>
-    <div class="fld"><label>Food type</label><select id="f-food"></select></div>
-    <div class="fld"><label>Hazard</label><select id="f-hazard"></select></div>
-    <div class="fld"><label>Class</label><select id="f-class"></select></div>
+  <section class="filters" id="filters" aria-label="Filters">
+    <div class="full"><div class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <input type="search" id="f-q" placeholder="Search firm, product, pathogen" aria-label="Search firm, product, or pathogen"></div></div>
+    <div class="fld"><label for="f-agency">Agency</label><select class="select" id="f-agency"></select></div>
+    <div class="fld"><label for="f-region">Region</label><select class="select" id="f-region"></select></div>
+    <div class="fld"><label for="f-food">Food type</label><select class="select" id="f-food"></select></div>
+    <div class="fld"><label for="f-hazard">Hazard</label><select class="select" id="f-hazard"></select></div>
+    <div class="fld"><label for="f-class">Class</label><select class="select" id="f-class"></select></div>
     <div class="full rowbtns">
-      <button class="ghost" id="btn-reset">Reset</button>
-      <button class="ghost" id="btn-export">Export CSV</button>
-      <button class="ghost" id="btn-load">Load file…</button>
-      <input type="file" id="file" accept=".json,.csv" style="display:none">
-      <label class="toggle"><input type="checkbox" id="btn-sample" checked> Show sample rows</label>
+      <label class="fchip"><input type="checkbox" id="btn-sample" checked><span class="fchip-body sl"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Sample rows</span></label>
+      <button type="button" class="btn text sl" id="btn-reset">Reset</button>
+      <button type="button" class="btn outlined sl" id="btn-export">Export CSV</button>
+      <button type="button" class="btn outlined sl" id="btn-load">Load file</button>
+      <input type="file" id="file" accept=".json,.csv" hidden>
     </div>
-  </div>
+  </section>
 
-  <section class="kpis" id="kpis"></section>
+  <section class="kpis" id="kpis" aria-label="Summary"></section>
 
-  <div class="panel">
-    <h2>Recalls per month &middot; by severity class</h2>
+  <section class="card">
+    <h2>Recalls per month<span class="sub">By severity class &middot; dashed lines mark policy events</span></h2>
     <div id="trend"></div>
     <div class="legend" id="trend-legend"></div>
-  </div>
-  <div class="panel">
-    <h2>By region <span class="conf" style="text-transform:none">(where distributed; multi-region counted each)</span></h2>
+  </section>
+  <section class="card">
+    <h2>By region<span class="sub">Where distributed; multi-region recalls count in each</span></h2>
     <div class="bars" id="region-bars"></div>
-    <h2 style="margin-top:16px">By hazard</h2>
+    <h2 style="margin-top:24px">By hazard</h2>
     <div class="bars" id="hazard-bars"></div>
-    <div class="legend" id="bars-legend" style="margin-top:10px"></div>
-  </div>
+    <div class="legend" id="bars-legend"></div>
+  </section>
 
-  <div class="count" id="count"></div>
-  <div class="tablewrap"><div id="rows"></div><div class="tablefoot" id="tablefoot"></div></div>
+  <div class="count" id="count" aria-live="polite"></div>
+  <section class="list" aria-label="Recalls"><div id="rows"></div><div class="listfoot" id="tablefoot"></div></section>
 
-  <div class="panel">
-    <h2>Policy &amp; regulatory timeline &middot; <span class="flag">flag</span> = trend confounder</h2>
+  <section class="card" style="margin-top:16px">
+    <h2>Policy &amp; regulatory timeline<span class="sub">Items tagged <b>confounder</b> can change reported counts independent of actual food safety</span></h2>
     <div id="policy"></div>
-  </div>
+  </section>
 
   <footer>
     <strong>Reading the data honestly.</strong>
@@ -307,7 +441,7 @@ const PATHOGENS = __PATHOGENS__;
 const ALLERGENS = __ALLERGENS__;
 
 const CLASS_ORDER=["Class I","Class II","Class III","Public Health Alert (USDA)"];
-const CLASS_COLOR={"Class I":"#C8351F","Class II":"#DE8A1E","Class III":"#4A7A8C","Public Health Alert (USDA)":"#7A5CA6"};
+const CLASS_COLOR={"Class I":"var(--sev-c1)","Class II":"var(--sev-c2)","Class III":"var(--sev-c3)","Public Health Alert (USDA)":"var(--sev-pha)"};
 const REGION_ORDER=["Northeast","Midwest","South","West","Territories","Nationwide","Unknown"];
 const ABBR_SET=new Set(Object.values(STATE_ABBR));
 const $=s=>document.querySelector(s), uniq=a=>[...new Set(a.filter(Boolean))];
@@ -441,9 +575,9 @@ async function fetchFSIS(year){
     return String(year)===String(r.field_year)||String(year)===suff;
   }).map(normFSIS);
 }
-function setPill(id,cls,txt){ const el=$(id); el.className="pill "+cls; el.textContent=txt; }
-function banner(kind,html){ const b=$("#banner"); if(!kind){b.className="banner";b.innerHTML="";return;}
-  b.className="banner show "+kind; b.innerHTML=html; }
+function setPill(id,cls,txt){ const el=$(id); el.className="tag "+({live:"live",warnp:"warn",sample:"sample"}[cls]||"outline"); el.textContent=txt; }
+function banner(kind,html){ const b=$("#banner"); if(!kind){b.className="notice";b.innerHTML="";return;}
+  b.className="notice show "+({sample:"error",warn:"warn"}[kind]||"info"); b.innerHTML=html; }
 
 async function refresh(){
   const year=$("#year").value;
@@ -509,7 +643,7 @@ function kpis(rows){
   const top=Object.entries(hz).sort((a,b)=>b[1]-a[1])[0];
   const cards=[["",rows.length,"Recalls (filtered)"],["sev",c1,"Class I (serious)"],
     ["",ongoing,"Ongoing / active"],["",fda+" / "+(rows.length-fda),"FDA / USDA"]];
-  $("#kpis").innerHTML=cards.map(([c,n,l])=>`<div class="kpi ${c}"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
+  $("#kpis").innerHTML=cards.map(([c,n,l])=>`<div class="card kpi ${c}" style="margin:0"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
 }
 function monthsIn(rows){ return uniq(rows.map(r=>r.year&&r.month?`${r.year}-${r.month}`:"")).sort(); }
 function trend(rows){
@@ -534,20 +668,20 @@ function trend(rows){
   counts.forEach((c,i)=>{
     const yr=c.m.slice(0,4);
     if(yr!==lastYear){const lx=x(i)-colW/2;
-      years+=`<line x1="${lx}" x2="${lx}" y1="${padT}" y2="${padT+plotH+6}" stroke="#C7D0D8"/><text x="${lx+3}" y="${H-padB+31}" text-anchor="start" fill="#16202A" style="font-weight:600">${yr}</text>`;
+      years+=`<line x1="${lx}" x2="${lx}" y1="${padT}" y2="${padT+plotH+6}" style="stroke:var(--md-outline)"/><text x="${lx+3}" y="${H-padB+31}" text-anchor="start" style="fill:var(--md-on-surface);font-weight:500">${yr}</text>`;
       lastYear=yr;}
     let acc=0;
     CLASS_ORDER.forEach(cl=>{const v=c[cl];if(!v)return;
       const h=plotH*v/maxV,yy=padT+plotH*(1-(acc+v)/maxV);
-      bars+=`<rect x="${x(i)-bw/2}" y="${yy}" width="${bw}" height="${h}" fill="${CLASS_COLOR[cl]}"><title>${c.m} · ${cl}: ${v}</title></rect>`;acc+=v;});
+      bars+=`<rect x="${x(i)-bw/2}" y="${yy}" width="${bw}" height="${h}" style="fill:${CLASS_COLOR[cl]}"><title>${c.m} · ${cl}: ${v}</title></rect>`;acc+=v;});
     bars+=`<text x="${x(i)}" y="${H-padB+14}" text-anchor="middle">${c.m.slice(5)}</text>`;
-    if(c.total) bars+=`<text x="${x(i)}" y="${y(c.total)-4}" text-anchor="middle" fill="#16202A">${c.total}</text>`;});
+    if(c.total) bars+=`<text x="${x(i)}" y="${y(c.total)-4}" text-anchor="middle" style="fill:var(--md-on-surface)">${c.total}</text>`;});
   let marks="";
   POLICY.forEach(p=>{const idx=months.indexOf((p.date||"").slice(0,7)); if(idx>=0){const xx=x(idx);
-    marks+=`<line x1="${xx}" x2="${xx}" y1="${padT}" y2="${padT+plotH}" stroke="#16202A" stroke-dasharray="3 3" opacity=".5"/><polygon points="${xx-4},${padT} ${xx+4},${padT} ${xx},${padT+7}" fill="#16202A"><title>${p.date} — ${p.title}</title></polygon>`;}});
+    marks+=`<line x1="${xx}" x2="${xx}" y1="${padT}" y2="${padT+plotH}" style="stroke:var(--md-on-surface)" stroke-dasharray="3 3" opacity=".5"/><polygon points="${xx-4},${padT} ${xx+4},${padT} ${xx},${padT+7}" style="fill:var(--md-on-surface)"><title>${p.date} — ${p.title}</title></polygon>`;}});
   host.innerHTML=`<div class="trend-scroll-wrap"><svg class="trend-axis" width="${AX}" height="${H}" aria-hidden="true">${axis}</svg>`
     +`<div class="trend-scroll"><svg width="${W}" height="${H}" role="img" aria-label="Recalls per month by class">${grid}${years}${bars}${marks}</svg></div></div>`;
-  $("#trend-legend").innerHTML=CLASS_ORDER.map(c=>`<span><i style="background:${CLASS_COLOR[c]}"></i>${c}</span>`).join("")+`<span><i style="background:#16202A"></i>policy event</span>`+(W>avail-AX?`<span style="color:#0F5C6E">scroll →</span>`:"");
+  $("#trend-legend").innerHTML=CLASS_ORDER.map(c=>`<span><i style="background:${CLASS_COLOR[c]}"></i>${c}</span>`).join("")+`<span><i style="background:var(--md-on-surface)"></i>policy event</span>`+(W>avail-AX?`<span style="color:var(--md-primary);font-weight:500">Scroll for more →</span>`:"");
 }
 function stackedBars(host,entries,max){
   host.innerHTML=entries.map(e=>{
@@ -571,25 +705,26 @@ function table(){
   $("#count").textContent=rows.length? `Showing ${Math.min(shown,rows.length).toLocaleString()} of ${rows.length.toLocaleString()} recalls`:"0 recalls";
   if(!rows.length){host.innerHTML='<div class="empty">No recalls match these filters.</div>';$("#tablefoot").innerHTML="";return;}
   host.innerHTML=rows.slice(0,shown).map(r=>{
-    const col=CLASS_COLOR[r.classification]||"#5A6B7B", agc=r.agency==="FDA"?"fda":"usda";
+    const col=CLASS_COLOR[r.classification]||"var(--md-outline)", agc=r.agency==="FDA"?"fda":"usda";
     const ill=illnessFor(r), ongoing=/ongoing|active|open|progress/i.test(r.status);
     const days=r.days_open!==""&&r.days_open!=null?`${r.days_open} days${r.date_closed?"":" (open)"}`:"—";
-    const illB=ill?`<div class="illness"><div class="h">If ${esc(r.agent||r.hazard_category)} — what it can cause</div><b>${esc(ill.illness)}.</b> ${esc(ill.symptoms)}<div style="margin-top:4px;color:var(--muted)">Onset ${esc(ill.onset)} · Higher risk: ${esc(ill.higher_risk)}</div></div>`:"";
-    return `<div class="rowc"><div class="rtop" onclick="this.parentNode.classList.toggle('open')">
+    const illB=ill?`<div class="illness"><div class="h">If ${esc(r.agent||r.hazard_category)} — what it can cause</div><b>${esc(ill.illness)}.</b> ${esc(ill.symptoms)}<div style="margin-top:4px;color:var(--md-on-surface-variant)">Onset ${esc(ill.onset)} · Higher risk: ${esc(ill.higher_risk)}</div></div>`:"";
+    return `<div class="rowc"><div class="rtop sl" tabindex="0" role="button" aria-expanded="false">
       <div class="spine" style="background:${col}"></div>
       <div class="rmid">
-        <div class="rmeta"><span class="chip ${agc}">${r.agency}</span><span>${r.date_reported||"—"}</span><span>${esc(r.regions)}</span></div>
+        <div class="rmeta"><span class="tag ${agc}">${r.agency}</span><span>${r.date_reported||"—"}</span><span>${esc(r.regions)}</span></div>
         <div class="firm">${esc(r.firm)||"—"}</div>
         <div class="prod">${esc(r.product_description)}</div>
       </div>
       <div class="cls" style="color:${col}">${(r.classification||"—").replace(" (USDA)","")}</div>
+      <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>
     </div>
     <div class="detail">
       <dl>
-        <dt>Recall #</dt><dd>${esc(r.recall_number)||"—"} ${r.is_sample==="Yes"?'<span class="flag">sample</span>':""}</dd>
+        <dt>Recall #</dt><dd>${esc(r.recall_number)||"—"} ${r.is_sample==="Yes"?'<span class="tag sample">Sample</span>':""}</dd>
         <dt>Reason</dt><dd>${esc(r.reason)||"—"}</dd>
         <dt>Hazard</dt><dd>${esc(r.hazard_category)}${r.agent?" · "+esc(r.agent):""}</dd>
-        <dt>Status</dt><dd><span class="spill ${ongoing?"on":""}">${esc(r.status)||"—"}</span> &nbsp;${days}</dd>
+        <dt>Status</dt><dd><span class="tag ${ongoing?"on":"outline"}">${esc(r.status)||"—"}</span> &nbsp;${days}</dd>
         <dt>Distribution</dt><dd>${esc(r.distribution_pattern)||"—"}${r.nationwide==="Yes"?" · Nationwide":""}</dd>
         <dt>Quantity</dt><dd>${esc(r.quantity_raw)||"—"}</dd>
         ${r.url?`<dt>Source</dt><dd><a href="${r.url}" target="_blank" rel="noopener">Agency recall page ↗</a></dd>`:""}
@@ -597,13 +732,13 @@ function table(){
     </div></div>`;}).join("");
   const remaining=rows.length-shown;
   $("#tablefoot").innerHTML = remaining>0 ?
-    `<button class="ghost" id="more-btn">Show ${Math.min(PAGE,remaining)} more</button>`
-    +`<button class="ghost" id="all-btn">Show all ${rows.length.toLocaleString()}</button>` : "";
+    `<button type="button" class="btn tonal sl" id="more-btn">Show ${Math.min(PAGE,remaining)} more</button>`
+    +`<button type="button" class="btn text sl" id="all-btn">Show all ${rows.length.toLocaleString()}</button>` : "";
   if(remaining>0){$("#more-btn").onclick=()=>{shown+=PAGE;table();};$("#all-btn").onclick=()=>{shown=rows.length;table();};}
 }
 function policy(){
   $("#policy").innerHTML=POLICY.map(p=>{const conf=(p.effect_on_recalls||"").includes("CONFOUNDER");
-    return `<div class="pol-item"><div class="pol-date">${p.date}</div><div><div class="pol-title">${esc(p.title)}</div><div class="pol-sum">${esc(p.summary)}</div><div class="pol-eff">${conf?'<span class="flag">confounder</span>':""}${esc(p.effect_on_recalls)}</div><div class="conf">confidence: ${esc(p.confidence)} · ${esc(p.source)}</div></div></div>`;}).join("");
+    return `<div class="pol-item"><div class="pol-date">${p.date}</div><div><div class="pol-title">${esc(p.title)}</div><div class="pol-sum">${esc(p.summary)}</div><div class="pol-eff">${conf?'<span class="tag warn">Confounder</span>':""}<span>${esc((p.effect_on_recalls||"").replace(/^CONFOUNDER:\s*/,""))}</span></div><div class="conf">confidence: ${esc(p.confidence)} · ${esc(p.source)}</div></div></div>`;}).join("");
 }
 function render(){const rows=filtered();tableRows=rows;shown=PAGE;kpis(rows);trend(rows);regionBars(rows);hazardBars(rows);table();}
 
@@ -615,7 +750,10 @@ $("#f-q").addEventListener("input",render);
 $("#btn-sample").addEventListener("change",render);
 $("#year").addEventListener("change",refresh);
 $("#btn-refresh").addEventListener("click",refresh);
-$("#btn-filters").addEventListener("click",()=>$("#filters").classList.toggle("open"));
+$("#btn-filters").addEventListener("click",e=>{const o=$("#filters").classList.toggle("open");e.currentTarget.setAttribute("aria-expanded",o);});
+function toggleRow(t){const row=t.closest(".rowc");const o=row.classList.toggle("open");t.setAttribute("aria-expanded",o);}
+$("#rows").addEventListener("click",e=>{const t=e.target.closest(".rtop");if(t)toggleRow(t);});
+$("#rows").addEventListener("keydown",e=>{const t=e.target.closest(".rtop");if(t&&(e.key==="Enter"||e.key===" ")){e.preventDefault();toggleRow(t);}});
 $("#btn-reset").addEventListener("click",()=>{["f-agency","f-region","f-food","f-hazard","f-class"].forEach(id=>$("#"+id).value="");$("#f-q").value="";$("#btn-sample").checked=true;render();});
 $("#btn-export").addEventListener("click",()=>{const rows=filtered();const cols=Object.keys(DATA[0]||{recall_id:1});
   const csv=[cols.join(",")].concat(rows.map(r=>cols.map(c=>{let v=(r[c]??"").toString().replace(/"/g,'""');return /[",\n]/.test(v)?`"${v}"`:v;}).join(","))).join("\n");

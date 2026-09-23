@@ -54,11 +54,14 @@ recall-monitor/
 │   ├── dashboard.html         desktop dashboard
 │   └── .nojekyll
 ├── guides/
-│   ├── SETUP_ON_GITHUB.md     host it on GitHub Pages
-│   ├── AUTOMATE_DAILY.md      the once-a-day auto-update
-│   └── DESKTOP_USAGE.md       run the tools on your computer
+│   ├── SETUP_ON_GITHUB.md      host it on GitHub Pages
+│   ├── SELF_HOSTED_RUNNER.md   fully-automatic daily updates (incl. USDA)
+│   ├── AUTOMATE_DAILY.md       background on the daily job + Task Scheduler
+│   ├── DESIGN_SYSTEM.md        Material Design 3 basis, checks, deviations
+│   └── DESKTOP_USAGE.md        run the tools on your computer
+├── update_recalls.bat          backup local updater (fetch → build → push)
 ├── .github/workflows/
-│   └── update-recalls.yml     the daily job
+│   └── update-recalls.yml      the daily job (runs on a self-hosted runner)
 ├── requirements.txt
 └── LICENSE
 ```
@@ -86,14 +89,26 @@ several years accumulates history. See
 
 - **Host it:** [`guides/SETUP_ON_GITHUB.md`](guides/SETUP_ON_GITHUB.md) — push
   the repo and set **Pages → Deploy from a branch → `main` / `docs`**.
-- **Automate it:** [`guides/AUTOMATE_DAILY.md`](guides/AUTOMATE_DAILY.md) — the
-  included workflow fetches, rebuilds `docs/`, and commits once a day.
+- **Automate it:** [`guides/SELF_HOSTED_RUNNER.md`](guides/SELF_HOSTED_RUNNER.md)
+  — the included workflow fetches, rebuilds `docs/`, and commits once a day.
 
-The phone app already fetches **FDA live on every open**, so automation mainly 
-keeps the embedded **USDA** snapshot current — and USDA may be blocked from 
-GitHub's cloud servers even though it works from your home machine. 
-The job degrades gracefully (FDA keeps updating; USDA holds at its 
-last good value). Details and a home-PC alternative are in the automation guide.
+Important reality about USDA and automation: USDA's server blocks requests from
+GitHub's cloud IPs, so the daily job **can't fetch USDA from GitHub's own
+runners** (confirmed — even third-party mirrors that tried this went stale). It
+*can* be fetched from a residential IP with `curl_cffi`. So the daily workflow is
+set to run on a **self-hosted runner on your PC**, which updates FDA **and**
+USDA. A `update_recalls.bat` + Task Scheduler backup does the same on demand. The
+phone app also fetches **FDA live on every open**, so FDA is current regardless.
+See the runner guide for setup and the security notes.
+
+## Design
+
+Both web outputs follow Google's **Material Design 3**: tokenized color roles
+with automatic light/dark themes, the M3 shape, type, and state-layer scales,
+48dp touch targets, and M3 window-size breakpoints. They pass an axe-core
+WCAG 2.2 AA audit with no violations. Sources, verification, and intentional
+deviations are documented in
+[`guides/DESIGN_SYSTEM.md`](guides/DESIGN_SYSTEM.md).
 
 ## Data sources
 
@@ -118,4 +133,6 @@ last good value). Details and a home-PC alternative are in the automation guide.
 
 ## License
 
-Code is released under the MIT License (see [`LICENSE`](LICENSE)).
+Code is released under the MIT License (see [`LICENSE`](LICENSE)) — replace
+`<Your Name>` with yours, or swap in a different license. The underlying recall
+data is public U.S. government information. This note is not legal advice.
