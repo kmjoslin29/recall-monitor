@@ -33,19 +33,21 @@ hex and replace the `--md-*` values at the top of the `<style>` block in
 | Focus | 3px indicator, 2px outer offset | `:focus-visible` ring in `secondary` |
 | Buttons | 40dp container, full corner, label-large | filled / tonal / outlined / text variants |
 | Touch targets | ≥48×48dp, ~8dp apart | buttons and chips extend their hit area to 48dp |
-| Filter chip | 32dp, small corner, secondary-container when selected | "Sample rows" toggle |
-| Text fields | outlined, 56dp, extra-small corner | filter `<select>`s |
-| Search | search bar, 56dp, full corner, surface-container-high | search field |
+| Progress indicator | linear, 4dp, primary on surface-container-highest | native `<progress>` on the mobile Refresh; indeterminate from 200 ms, determinate after 5 s; start/finish announced via a polite live region |
+| Empty / error state | what happened, why, one primary action | shown when no data is loaded or a live fetch fails; never substitutes sample rows |
+| Text fields | outlined, 56dp, extra-small corner, visible label | filter `<select>`s and the search field (one text-field variant per region) |
 | Cards | outlined card, medium (12dp) corner, 1dp outline-variant | KPIs and chart panels |
 | Lists | one-line 56dp, two-line 72dp, three-line 88dp | desktop rows 56dp; compact 72dp; mobile 88dp |
 | Type scale | display → label roles | headline, title, body, label roles |
-| Motion | standard easing `cubic-bezier(0.2,0,0,1)`, short4 200ms | state layers, chevron; disabled under reduced motion |
-| Layout | compact <600dp (16dp margins); medium 600–839dp (24dp, single pane); expanded ≥840dp (two panes, 24dp spacer) | breakpoints at 600 / 840 / 1200px |
+| Motion | standard easing `cubic-bezier(0.2,0,0,1)`, short4 200ms | state layers; chevron uses an Expressive-style spring approximated with CSS `linear()`; under reduced motion movement is dropped and opacity/color changes stay |
+| Layout | five window size classes: compact <600, medium 600–839, expanded 840–1199, large 1200–1599, extra-large ≥1600 | desktop: single pane below 840, two panes from 840, content max-width 1280px (1560px at ≥1600). Margins: 16dp compact, 24dp medium and up. Large/extra-large margins are **not verified** against the spec. Mobile app keeps a fixed 840px reading column on purpose. |
 
 ## Verification
 
 - **axe-core (WCAG 2.2 AA, incl. target-size):** 0 violations on both pages,
-  light and dark, at 1280px and 390px widths.
+  light and dark, populated and empty states, at 1280/1700px (desktop) and 390/320px (mobile).
+- **Text spacing (WCAG 1.4.12):** line-height 1.5, letter-spacing 0.12em, word-spacing 0.16em, paragraph spacing 2x applied in a browser test; no clipped controls and no horizontal overflow at 320px.
+- **Security:** every record field is HTML-escaped before rendering, only `https:` source links render, loaded files are shape-checked, and CSV exports prefix cells starting with `= + - @` with `'` (formula injection).
 - **Contrast (computed from the tokens):** body text 8.4–16:1; severity labels
   ~4.8:1 (light) and ~8.7:1 (dark) against their containers — all above the
   4.5:1 text minimum. axe can't reliably test text inside SVG charts, so chart
@@ -57,9 +59,7 @@ hex and replace the `--md-*` values at the top of the `<style>` block in
 1. **Typeface.** M3's baseline is Roboto, but no webfont is loaded so the files
    stay offline and self-contained. The stack lists Roboto first and falls back
    to the system sans (Segoe UI on Windows, SF on iOS).
-2. **Select labels.** M3's outlined select floats its label into the outline
-   notch. Labels here sit above the field, which keeps the native `<select>`
-   (best screen-reader and mobile picker support).
+2. **Native selects.** M3 describes custom menus for select. Native `<select>` is kept for screen-reader and mobile-picker support (a choice recorded by the owner). Labels sit above fields, which M3 permits as an adjacent label, so that part is not a deviation.
 3. **Static tags.** Agency, status, and "confounder" labels are chip-shaped but
    non-interactive. M3 chips are interactive and M3 badges are for counts, so
    there's no exact match for a static label.
@@ -78,6 +78,9 @@ hex and replace the `--md-*` values at the top of the `<style>` block in
    than an animated ripple.
 9. **Density.** Filter fields keep the full 56dp height on desktop; no reduced
    density is applied.
+10. **Contrast measurement.** Pass/fail uses the WCAG 2.x ratio; APCA values, where shown, are informational only.
+11. **Expressive motion.** Springs are approximated with CSS `linear()` easing curves, not true physics-based springs, so velocity is not preserved when an interaction is interrupted.
+12. **Large and extra-large layout.** The spec's margin values for these classes are unverified here; the 24dp medium-and-up margin is reused.
 
 The Excel workbook shares the light-scheme **colors** only; M3 governs screen
 UI, so its fonts and layout stay spreadsheet-native.

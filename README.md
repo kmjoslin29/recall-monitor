@@ -48,7 +48,8 @@ recall-monitor/
 ├── build_mobile.py            data → docs/index.html (phone app)
 ├── build_workbook.py          data → Food_Recall_Tracker.xlsx (local)
 ├── data/
-│   └── recalls_master.json    the running dataset (+ .csv); source of truth
+│   └── recalls_master.json    the running dataset (+ .csv); created by fetch_recalls.py
+│                              (not shipped: the pages open to an empty state until it exists)
 ├── docs/                      ← GitHub Pages serves this folder
 │   ├── index.html             mobile app
 │   ├── dashboard.html         desktop dashboard
@@ -58,6 +59,7 @@ recall-monitor/
 │   ├── SELF_HOSTED_RUNNER.md   fully-automatic daily updates (incl. USDA)
 │   ├── AUTOMATE_DAILY.md       background on the daily job + Task Scheduler
 │   ├── DESIGN_SYSTEM.md        Material Design 3 basis, checks, deviations
+│   └── ui-ux/                  rules-pack profile + generated UI/UX checklist
 │   └── DESKTOP_USAGE.md        run the tools on your computer
 ├── update_recalls.bat          backup local updater (fetch → build → push)
 ├── .github/workflows/

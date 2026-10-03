@@ -55,9 +55,9 @@ re-fetches FDA when opened.
 
 ## Put your real data in it
 
-The repo ships with the small **sample** dataset so the site renders immediately.
-To publish your real recalls, replace **`data/recalls_master.json`** with your
-backfilled copy (the one you built on your PC with USDA included), then rebuild
+The repo ships with **no data** (the pages open to an empty state). Do not copy this
+repo's `data/` over an existing one. To publish your real recalls, put
+**`data/recalls_master.json`** in place: your backfilled copy (the one you built on your PC with USDA included), then rebuild
 and push:
 
 ```bash

@@ -20,7 +20,8 @@ Typical use (Windows / PowerShell / CLI):
     python fetch_recalls.py                 # current year, both agencies
     python fetch_recalls.py --year 2026
     python fetch_recalls.py --since 2026-01-01
-    python fetch_recalls.py --sample        # write labeled demo rows (no network)
+    python fetch_recalls.py --sample        # TESTING ONLY: labeled demo rows (no network); the
+                                            # dashboards hide them unless RECALL_INCLUDE_SAMPLE=1
 
 Then rebuild the outputs:
     python build_workbook.py
@@ -519,10 +520,9 @@ def main():
                 print(f"  USDA fetch error: {e}", file=sys.stderr)
 
     if not new and not master:
-        print("\nNo records fetched (network may be blocked) and no existing "
-              "master. Writing SAMPLE data so you can preview the tool.\n"
-              "Re-run without --sample once you have API access.", file=sys.stderr)
-        new = sample_records(args.year)
+        sys.exit("\nNo records fetched (network may be blocked) and no existing master.\n"
+                 "Nothing was written. Check your connection and re-run. "
+                 "(--sample writes labeled demo rows for testing only.)")
 
     if args.since:
         new = [r for r in new if r.get("date_reported", "") >= args.since]

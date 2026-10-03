@@ -1,0 +1,29 @@
+{
+  "$schema": "../schema/tool.schema.json",
+  "tool": "recall-monitor",
+  "name": "US Food Recall Monitor",
+  "description": "Logs FDA and USDA FSIS food recalls, with region derived from distribution. One dataset drives a desktop dashboard, an iPhone home-screen app and an Excel workbook. Static pages on GitHub Pages; the repository is public.",
+  "features": [
+    "has-forms",
+    "imports-files",
+    "exports-csv",
+    "long-operations"
+  ],
+  "overrides": [],
+  "choices": [
+    { "topic": "Select controls", "choice": "Keep native <select> elements for the filter and year fields, for screen-reader and mobile-picker support. Labels sit above the fields.", "decision": 50 },
+    { "topic": "Search field", "choice": "Outlined text field with a visible \"Search\" label above it; the placeholder is a hint only. Matches the outlined selects (one text-field variant per region).", "rules": ["F1", "F2", "F21"] },
+    { "topic": "First run and no data", "choice": "Pages open to an empty state with one primary action (refresh or load a file). Sample rows are never shown; on a failed live fetch the mobile app shows an error state, or the last published snapshot if one exists.", "rules": ["E2", "E3", "E4"], "decision": 84 },
+    { "topic": "Loading feedback", "choice": "Native <progress> on the mobile Refresh: indeterminate from 200 ms, determinate (sources finished of 2) after 5 s. Start, finish and failure are announced through a polite live region.", "decision": 78 },
+    { "topic": "Opened files", "choice": "A loaded file must be an array of objects with recall_id, agency and classification, or it is rejected and the current data is kept. Every field is HTML-escaped and only https links render.", "rules": ["S10"], "decision": 95 },
+    { "topic": "CSV export", "choice": "Cells starting with = + - @ tab or CR are prefixed with an apostrophe.", "rules": ["X12"], "decision": 91 },
+    { "topic": "Restore on return", "choice": "Not applicable: the tool keeps no work in browser storage.", "status": "decided" },
+    { "topic": "Large and extra-large margins", "choice": "Reuse the 24dp medium-and-up margin; the spec values for these window size classes are not verified.", "decision": 13, "status": "open" }
+  ],
+  "exceptions": [],
+  "notes": [
+    "Not declared: stores-data (no browser storage), has-destructive-actions (loading a file replaces only the in-memory view and a failed load keeps current data), has-intro (the Add to Home Screen tip is not an intro), shares-links, shares-files.",
+    "Consider-tier items not yet built, pending the owner: 404 page (E26), dismissible Add to Home Screen tip (E8), undo after loading a file (X7).",
+    "Large (1200-1599) and extra-large (>=1600) desktop layouts only widen the content column; the mobile app keeps a fixed 840px reading column on purpose."
+  ]
+}
