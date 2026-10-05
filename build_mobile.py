@@ -10,7 +10,8 @@ Design notes
     live fetch works. USDA FSIS may block cross-origin browser requests (CORS);
     if it does, the app keeps FDA live, shows a clear note, and lets you load
     USDA from a file. It never just breaks.
-  * Ships with the last published real data (if any) as an offline snapshot; with none, it opens to an empty state.
+  * Embeds the last published snapshot (never sample rows) as the offline fallback.
+    With no data at all it shows an empty state with one primary action (decision 128).
   * The region / food-type / hazard logic from reference_data.py is ported to
     JavaScript here so live records get the same treatment as the desktop tool.
 
@@ -29,7 +30,7 @@ import sys
 import reference_data as ref
 
 OUT = "recall_monitor_mobile.html"
-SAMPLE_JSON = os.path.join("data", "recalls_master.json")
+SNAPSHOT_JSON = os.path.join("data", "recalls_master.json")
 
 
 def make_icon():
@@ -55,10 +56,12 @@ def make_icon():
     return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
 
 
-def load_sample():
-    if os.path.exists(SAMPLE_JSON):
-        with open(SAMPLE_JSON, encoding="utf-8") as f:
-            return [r for r in json.load(f) if os.environ.get("RECALL_INCLUDE_SAMPLE") == "1" or r.get("is_sample") != "Yes"]
+def load_snapshot():
+    """Last published snapshot; sample rows are never embedded (decision 128)."""
+    if os.path.exists(SNAPSHOT_JSON):
+        with open(SNAPSHOT_JSON, encoding="utf-8") as f:
+            rows = json.load(f)
+        return [r for r in rows if r.get("is_sample") != "Yes"]
     return []
 
 
@@ -114,8 +117,7 @@ TEMPLATE = r"""<!doctype html>
   /* state layers */
   --md-state-hover:.08;--md-state-focus:.10;--md-state-pressed:.10;
   /* motion */
-  --md-ease-standard:cubic-bezier(0.2,0,0,1);
-  --md-ease-spatial:linear(0,.18 6%,.52 14%,.82 24%,1.02 36%,1.06 44%,1.03 54%,.995 68%,1);--md-dur-short4:200ms;
+  --md-ease-standard:cubic-bezier(0.2,0,0,1);--md-dur-short4:200ms;
   /* type — Roboto is the M3 baseline typeface; system fallbacks keep the
      file offline/self-contained (no webfont download). */
   --md-font:Roboto,"Google Sans Text",system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
@@ -208,16 +210,15 @@ code{font-family:var(--md-font-mono);font-size:.8125rem}
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2370787c' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")}
 .select:hover{border-color:var(--md-on-surface)}
 .select:focus-visible{outline:none;border:2px solid var(--md-primary);padding-left:15px}
-.search{display:flex;align-items:center;gap:8px;height:56px;padding:0 16px;
-  border:1px solid var(--md-outline);border-radius:var(--md-shape-xs);background:var(--md-surface);
+.search{display:flex;align-items:center;gap:4px;height:56px;padding:0 16px 0 16px;
+  border-radius:var(--md-shape-full);background:var(--md-surface-container-high);
   color:var(--md-on-surface-variant)}
-.search:hover{border-color:var(--md-on-surface)}
 .search svg{width:24px;height:24px;fill:currentColor;flex:0 0 auto}
 .search input{flex:1;min-width:0;height:100%;border:0;background:transparent;
-  font:inherit;font-size:1rem;line-height:1.5rem;color:var(--md-on-surface);padding:0}
+  font:inherit;font-size:1rem;line-height:1.5rem;color:var(--md-on-surface);padding:0 8px}
 .search input::placeholder{color:var(--md-on-surface-variant)}
 .search input:focus-visible{outline:none}
-.search:focus-within{border:2px solid var(--md-primary);padding:0 15px}
+.search:focus-within{outline:3px solid var(--md-secondary);outline-offset:2px}
 
 /* ===== cards (outlined: medium corner, 1px outline-variant) =============== */
 .card{background:var(--md-surface);border:1px solid var(--md-outline-variant);
@@ -238,7 +239,6 @@ code{font-family:var(--md-font-mono);font-size:.8125rem}
 .tag.outline{border:1px solid var(--md-outline-variant);color:var(--md-on-surface-variant)}
 .tag.on{background:var(--warn-container);color:var(--on-warn-container)}
 .tag.live{background:var(--md-primary-container);color:var(--md-on-primary-container)}
-.tag.sample{background:var(--md-error-container);color:var(--md-on-error-container)}
 
 /* notice (filled card in error/secondary containers; M3 has no banner) */
 .notice{border-radius:var(--md-shape-md);padding:12px 16px;font-size:.875rem;line-height:1.25rem}
@@ -263,7 +263,6 @@ code{font-family:var(--md-font-mono);font-size:.8125rem}
   color:var(--md-on-surface-variant)}
 .trend-scroll-wrap{display:flex;align-items:flex-start}
 .trend-axis{flex:0 0 auto}
-.trend-scroll:focus-visible{outline:3px solid var(--md-secondary);outline-offset:2px}
 .trend-scroll{overflow-x:auto;overflow-y:hidden;flex:1 1 auto;min-width:0;
   -webkit-overflow-scrolling:touch;scrollbar-width:thin}
 .trend-scroll svg{display:block}
@@ -271,6 +270,12 @@ svg text{font-family:var(--md-font);font-size:11px;fill:var(--md-on-surface-vari
   font-variant-numeric:tabular-nums}
 .axis{stroke:var(--md-outline-variant)}
 .empty{padding:40px 16px;text-align:center;color:var(--md-on-surface-variant)}
+
+/* empty state (decision 128): with no data, only the empty state and one primary action show */
+.empty-state{display:none;padding:48px 16px;text-align:center}
+.empty-state p{margin:0 0 16px;color:var(--md-on-surface-variant)}
+.no-data .data-only{display:none!important}
+.no-data .empty-state{display:block}
 
 /* ===== expandable list ==================================================== */
 .list{background:var(--md-surface);border:1px solid var(--md-outline-variant);
@@ -285,7 +290,7 @@ svg text{font-family:var(--md-font);font-size:11px;fill:var(--md-on-surface-vari
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cls{font-size:.75rem;line-height:1rem;font-weight:500;letter-spacing:.03125rem;white-space:nowrap}
 .chev{width:24px;height:24px;fill:var(--md-on-surface-variant);flex:0 0 auto;
-  transition:transform 350ms var(--md-ease-spatial)}
+  transition:transform var(--md-dur-short4) var(--md-ease-standard)}
 .row.open .chev{transform:rotate(180deg)}
 .detail{display:none;padding:8px 16px 16px 36px;background:var(--md-surface-container-low)}
 .row.open .detail{display:block}
@@ -316,26 +321,7 @@ footer{margin-top:32px;padding-top:16px;border-top:1px solid var(--md-outline-va
 footer ul{margin:8px 0 0;padding-left:20px}
 footer strong{color:var(--md-on-surface)}
 
-/* Decision 18: reduced motion keeps opacity/color changes, drops movement */
-@media (prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}
-  .chev{transition:none!important}
-  *{animation:none!important}
-  .prog:indeterminate{animation:none!important}
-}
-[hidden]{display:none!important}
-.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-/* M3 linear progress: 4dp track, primary indicator */
-.prog{display:block;width:100%;height:4px;margin:0 0 16px;border:0;border-radius:2px;appearance:none;-webkit-appearance:none;
-  background:var(--md-surface-container-highest);color:var(--md-primary);overflow:hidden}
-.prog::-webkit-progress-bar{background:var(--md-surface-container-highest)}
-.prog::-webkit-progress-value{background:var(--md-primary);transition:width 200ms var(--md-ease-standard)}
-.prog::-moz-progress-bar{background:var(--md-primary)}
-.prog:indeterminate{background:linear-gradient(90deg,var(--md-surface-container-highest) 0 30%,var(--md-primary) 30% 60%,var(--md-surface-container-highest) 60%) 0 0/200% 100%;animation:prog-slide 1.4s linear infinite}
-@keyframes prog-slide{from{background-position:200% 0}to{background-position:-100% 0}}
-.empty-card{padding:32px 24px;text-align:center;margin:8px 0 16px}
-.empty-card p{margin:0 auto 16px;max-width:52ch;color:var(--md-on-surface-variant)}
-.empty-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
 
 /* ===== mobile layout (M3 compact window: 16dp margins) ==================== */
 body{padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
@@ -363,7 +349,7 @@ h1{margin:0}
 .rowc:last-child{border-bottom:0}
 .rtop{display:grid;grid-template-columns:4px minmax(0,1fr) auto 24px;gap:12px;align-items:center;
   padding:12px 16px;min-height:88px;cursor:pointer}                   /* three-line list item */
-.rmeta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:.75rem;line-height:1rem;
+.rmeta{display:flex;gap:8px;align-items:center;font-size:.75rem;line-height:1rem;
   color:var(--md-on-surface-variant);margin-bottom:2px;min-width:0}
 .rmeta span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rowc.open .detail{display:block}
@@ -374,7 +360,6 @@ h1{margin:0}
 .a2hs{display:none;margin-bottom:16px}.a2hs.show{display:block}
 @media (min-width:600px){.wrap{padding:0 24px 72px}.kpis{grid-template-columns:repeat(4,1fr)}
   .filters{grid-template-columns:repeat(3,1fr)}}                     /* medium: 24dp */
-@media (max-width:599px){.pol-item{grid-template-columns:1fr;gap:4px}}
 @media (max-width:379px){.detail dl{grid-template-columns:1fr}
   .controls{grid-template-columns:1fr 1fr}.controls .fld{grid-column:1/-1}.controls .btn{margin-bottom:0}}
 </style>
@@ -392,15 +377,7 @@ h1{margin:0}
   </header>
 
   <div class="notice info a2hs" id="a2hs">Tip: tap <b>Share → Add to Home Screen</b> to keep this as an app that refreshes on open.</div>
-  <progress id="prog" class="prog" aria-label="Loading recalls" max="2" hidden></progress>
-  <div class="vh" id="live" role="status" aria-live="polite"></div>
   <div class="notice" id="banner" role="status"></div>
-  <section class="card empty-card" id="empty-state" hidden>
-    <h2>No recalls to show yet</h2>
-    <p>Live data hasn't loaded. Check your connection and tap Refresh, or load a recalls file from the desktop tool.</p>
-    <div class="empty-actions"><button type="button" class="btn filled sl" id="btn-refresh-empty">Refresh</button>
-    <button type="button" class="btn text sl" id="btn-load-empty">Load file</button></div>
-  </section>
 
   <div class="controls">
     <div class="fld"><label for="year">Year</label><select class="select" id="year"></select></div>
@@ -409,8 +386,8 @@ h1{margin:0}
   </div>
 
   <section class="filters" id="filters" aria-label="Filters">
-    <div class="full fld"><label for="f-q">Search</label><div class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-      <input type="search" id="f-q" placeholder="Firm, product, or pathogen"></div></div>
+    <div class="full"><div class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <input type="search" id="f-q" placeholder="Search firm, product, pathogen" aria-label="Search firm, product, or pathogen"></div></div>
     <div class="fld"><label for="f-agency">Agency</label><select class="select" id="f-agency"></select></div>
     <div class="fld"><label for="f-region">Region</label><select class="select" id="f-region"></select></div>
     <div class="fld"><label for="f-food">Food type</label><select class="select" id="f-food"></select></div>
@@ -424,14 +401,19 @@ h1{margin:0}
     </div>
   </section>
 
-  <section class="kpis" id="kpis" aria-label="Summary"></section>
+  <section class="kpis data-only" id="kpis" aria-label="Summary"></section>
 
-  <section class="card">
+  <section class="card empty-state" id="empty-state">
+    <h2>No recall data yet</h2>
+    <p id="empty-msg">Tap Refresh to fetch live FDA and USDA recalls.</p>
+  </section>
+
+  <section class="card data-only">
     <h2>Recalls per month<span class="sub">By severity class &middot; dashed lines mark policy events</span></h2>
     <div id="trend"></div>
     <div class="legend" id="trend-legend"></div>
   </section>
-  <section class="card">
+  <section class="card data-only">
     <h2>By region<span class="sub">Where distributed; multi-region recalls count in each</span></h2>
     <div class="bars" id="region-bars"></div>
     <h2 style="margin-top:24px">By hazard</h2>
@@ -439,10 +421,10 @@ h1{margin:0}
     <div class="legend" id="bars-legend"></div>
   </section>
 
-  <div class="count" id="count" aria-live="polite"></div>
-  <section class="list" aria-label="Recalls"><div id="rows"></div><div class="listfoot" id="tablefoot"></div></section>
+  <div class="count data-only" id="count" aria-live="polite"></div>
+  <section class="list data-only" aria-label="Recalls"><div id="rows"></div><div class="listfoot" id="tablefoot"></div></section>
 
-  <section class="card policy-card" style="margin-top:16px">
+  <section class="card data-only" style="margin-top:16px">
     <h2>Policy &amp; regulatory timeline<span class="sub">Items tagged <b>confounder</b> can change reported counts independent of actual food safety</span></h2>
     <div id="policy"></div>
   </section>
@@ -461,7 +443,7 @@ h1{margin:0}
 </div>
 
 <script>
-const SNAPSHOT = __SAMPLE_JSON__;   // last published real data (may be empty)
+const SNAPSHOT = __SNAPSHOT_JSON__;   // last published snapshot; never sample rows
 const POLICY  = __POLICY_JSON__;
 const ILLNESS = __ILLNESS_JSON__;
 const REGION_OF = __REGION_OF__;
@@ -475,7 +457,7 @@ const CLASS_COLOR={"Class I":"var(--sev-c1)","Class II":"var(--sev-c2)","Class I
 const REGION_ORDER=["Northeast","Midwest","South","West","Territories","Nationwide","Unknown"];
 const ABBR_SET=new Set(Object.values(STATE_ABBR));
 const $=s=>document.querySelector(s), uniq=a=>[...new Set(a.filter(Boolean))];
-let DATA=SNAPSHOT.slice(), loaded=false, sortKey="date_reported", sortDir=-1;
+let DATA=SNAPSHOT.slice(), sortKey="date_reported", sortDir=-1;
 const PAGE=50; let shown=PAGE, tableRows=[];
 
 /* ---------- ported classifiers (mirror reference_data.py) ---------- */
@@ -609,52 +591,39 @@ function setPill(id,cls,txt){ const el=$(id); el.className="tag "+({live:"live",
 function banner(kind,html){ const b=$("#banner"); if(!kind){b.className="notice";b.innerHTML="";return;}
   b.className="notice show "+({error:"error",warn:"warn"}[kind]||"info"); b.innerHTML=html; }
 
-let progTimer=null, progSwitch=null;
-function progStart(){
-  const pr=$("#prog"); pr.removeAttribute("value"); pr.setAttribute("max","2");
-  clearTimeout(progTimer); clearTimeout(progSwitch);
-  $("#live").textContent="Loading recalls for "+$("#year").value+".";
-  progTimer=setTimeout(()=>{pr.hidden=false;},200);                       // 200 ms–5 s: indeterminate loading
-  progSwitch=setTimeout(()=>{pr.value=0;},5000);                          // over 5 s: determinate (sources finished of 2)
-}
-function progStep(n){const pr=$("#prog"); if(pr.hasAttribute("value")) pr.value=n;}
-function progEnd(msg){clearTimeout(progTimer);clearTimeout(progSwitch);$("#prog").hidden=true;$("#live").textContent=msg;}
-
 async function refresh(){
   const year=$("#year").value;
   setPill("#pill-fda","","FDA …"); setPill("#pill-usda","","USDA …");
-  $("#btn-refresh").disabled=true; progStart();
-  let done=0;
-  const [fda,usda]=await Promise.allSettled([
-    fetchFDA(year).finally(()=>progStep(++done)), fetchFSIS(year).finally(()=>progStep(++done))]);
+  $("#btn-refresh").disabled=true;
+  const [fda,usda]=await Promise.allSettled([fetchFDA(year),fetchFSIS(year)]);
   let live=[], notes=[];
   if(fda.status==="fulfilled"){ live=live.concat(fda.value);
     setPill("#pill-fda","live",`FDA ● ${fda.value.length}`); }
   else { setPill("#pill-fda","warnp","FDA ▲ blocked");
-    notes.push("FDA live fetch failed ("+esc(fda.reason&&fda.reason.message||"network/CORS")+")."); }
+    notes.push("FDA live fetch failed ("+(fda.reason&&fda.reason.message||"network/CORS")+")."); }
   if(usda.status==="fulfilled"){ live=live.concat(usda.value);
     setPill("#pill-usda","live",`USDA ● ${usda.value.length}`); }
   else { setPill("#pill-usda","warnp","USDA ▲ blocked");
-    notes.push("USDA doesn't allow in-browser fetch here — use <b>Load file</b> with a USDA CSV/JSON, or refresh USDA from the desktop tool."); }
+    notes.push("USDA doesn't allow in-browser fetch here — use <b>Load file…</b> with a USDA CSV/JSON, or refresh USDA from the desktop tool."); }
 
-  loaded=true;
   if(live.length){
     const m=new Map(); live.forEach(r=>m.set(r.recall_id,r)); DATA=[...m.values()];
     $("#updated").textContent="updated "+new Date().toLocaleString();
     if(notes.length) banner("warn",notes.join(" ")); else banner();
-    progEnd("Loaded "+live.length.toLocaleString()+" recalls for "+year+".");
   } else {
-    setPill("#pill-fda","warnp","FDA ▲ failed"); setPill("#pill-usda","warnp","USDA ▲ failed");
-    banner("error","Couldn't load live recall data. "+(SNAPSHOT.length?"Showing the last published snapshot. ":"")
-      +"If you opened this file locally, host it at a URL (or add it to your Home Screen) and tap Refresh. "+notes.join(" "));
-    progEnd("Couldn't load live recall data.");
+    setPill("#pill-fda","warnp","FDA ▲ unavailable"); setPill("#pill-usda","warnp","USDA ▲ unavailable");
+    const why="Couldn't reach the live APIs from this browser. This is expected if you opened the file locally — host it at a URL (or add to Home Screen) and tap Refresh. "+notes.join(" ");
+    if(SNAPSHOT.length){ DATA=SNAPSHOT.slice(); $("#updated").textContent="last published snapshot";
+      banner("warn","Showing the last published snapshot. "+why); }
+    else { DATA=[]; $("#empty-msg").textContent="Couldn't load recalls. Tap Refresh to try again, or use Filters ▸ Load file.";
+      banner("error",why); }
   }
   $("#btn-refresh").disabled=false;
   populate(); render();
 }
 
 /* ---------- filtering + views (shared with desktop) ---------- */
-function opts(sel,vals,all="All"){ sel.innerHTML=`<option value="">${all}</option>`+vals.map(v=>`<option>${esc(v)}</option>`).join(""); }
+function opts(sel,vals,all="All"){ sel.innerHTML=`<option value="">${all}</option>`+vals.map(v=>`<option>${v}</option>`).join(""); }
 function populate(){
   opts($("#f-agency"),uniq(DATA.map(r=>r.agency)).sort());
   opts($("#f-region"),REGION_ORDER.filter(r=>DATA.some(d=>(d.regions||"").includes(r))));
@@ -685,7 +654,7 @@ function kpis(rows){
   const top=Object.entries(hz).sort((a,b)=>b[1]-a[1])[0];
   const cards=[["",rows.length,"Recalls (filtered)"],["sev",c1,"Class I (serious)"],
     ["",ongoing,"Ongoing / active"],["",fda+" / "+(rows.length-fda),"FDA / USDA"]];
-  $("#kpis").innerHTML=cards.map(([c,n,l])=>`<div class="card kpi ${c}" style="margin:0"><div class="n">${esc(n)}</div><div class="l">${l}</div></div>`).join("");
+  $("#kpis").innerHTML=cards.map(([c,n,l])=>`<div class="card kpi ${c}" style="margin:0"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
 }
 function monthsIn(rows){ return uniq(rows.map(r=>r.year&&r.month?`${r.year}-${r.month}`:"")).sort(); }
 function trend(rows){
@@ -722,7 +691,7 @@ function trend(rows){
   POLICY.forEach(p=>{const idx=months.indexOf((p.date||"").slice(0,7)); if(idx>=0){const xx=x(idx);
     marks+=`<line x1="${xx}" x2="${xx}" y1="${padT}" y2="${padT+plotH}" style="stroke:var(--md-on-surface)" stroke-dasharray="3 3" opacity=".5"/><polygon points="${xx-4},${padT} ${xx+4},${padT} ${xx},${padT+7}" style="fill:var(--md-on-surface)"><title>${p.date} — ${p.title}</title></polygon>`;}});
   host.innerHTML=`<div class="trend-scroll-wrap"><svg class="trend-axis" width="${AX}" height="${H}" aria-hidden="true">${axis}</svg>`
-    +`<div class="trend-scroll" tabindex="0" role="region" aria-label="Recalls per month chart, scrollable"><svg width="${W}" height="${H}" role="img" aria-label="Recalls per month by class">${grid}${years}${bars}${marks}</svg></div></div>`;
+    +`<div class="trend-scroll"><svg width="${W}" height="${H}" role="img" aria-label="Recalls per month by class">${grid}${years}${bars}${marks}</svg></div></div>`;
   $("#trend-legend").innerHTML=CLASS_ORDER.map(c=>`<span><i style="background:${CLASS_COLOR[c]}"></i>${c}</span>`).join("")+`<span><i style="background:var(--md-on-surface)"></i>policy event</span>`+(W>avail-AX?`<span style="color:var(--md-primary);font-weight:500">Scroll for more →</span>`:"");
 }
 function stackedBars(host,entries,max){
@@ -741,8 +710,7 @@ function hazardBars(rows){const m={};rows.forEach(r=>{const h=r.hazard_category|
   stackedBars($("#hazard-bars"),arr,Math.max(1,...arr.map(e=>e.total)));}
 function drawBarsLegend(){$("#bars-legend").innerHTML=CLASS_ORDER.map(c=>`<span><i style="background:${CLASS_COLOR[c]}"></i>${c}</span>`).join("");}
 function illnessFor(r){return ILLNESS[r.agent]||(r.hazard_category==="Undeclared allergen"?ILLNESS["Undeclared allergen"]:null)||(r.hazard_category==="Foreign material"?ILLNESS["Foreign material"]:null);}
-function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function safeUrl(u){try{const x=new URL(String(u||""));return x.protocol==="https:"?x.href:"";}catch(e){return "";}}
+function esc(s){return (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));}
 function table(){
   const rows=tableRows, host=$("#rows");
   $("#count").textContent=rows.length? `Showing ${Math.min(shown,rows.length).toLocaleString()} of ${rows.length.toLocaleString()} recalls`:"0 recalls";
@@ -750,16 +718,16 @@ function table(){
   host.innerHTML=rows.slice(0,shown).map(r=>{
     const col=CLASS_COLOR[r.classification]||"var(--md-outline)", agc=r.agency==="FDA"?"fda":"usda";
     const ill=illnessFor(r), ongoing=/ongoing|active|open|progress/i.test(r.status);
-    const days=r.days_open!==""&&r.days_open!=null?`${esc(r.days_open)} days${r.date_closed?"":" (open)"}`:"—";
+    const days=r.days_open!==""&&r.days_open!=null?`${r.days_open} days${r.date_closed?"":" (open)"}`:"—";
     const illB=ill?`<div class="illness"><div class="h">If ${esc(r.agent||r.hazard_category)} — what it can cause</div><b>${esc(ill.illness)}.</b> ${esc(ill.symptoms)}<div style="margin-top:4px;color:var(--md-on-surface-variant)">Onset ${esc(ill.onset)} · Higher risk: ${esc(ill.higher_risk)}</div></div>`:"";
     return `<div class="rowc"><div class="rtop sl" tabindex="0" role="button" aria-expanded="false">
       <div class="spine" style="background:${col}"></div>
       <div class="rmid">
-        <div class="rmeta"><span class="tag ${agc}">${esc(r.agency)}</span><span>${esc(r.date_reported)||"—"}</span><span>${esc(r.regions)}</span></div>
+        <div class="rmeta"><span class="tag ${agc}">${r.agency}</span><span>${r.date_reported||"—"}</span><span>${esc(r.regions)}</span></div>
         <div class="firm">${esc(r.firm)||"—"}</div>
         <div class="prod">${esc(r.product_description)}</div>
       </div>
-      <div class="cls" style="color:${col}">${esc((r.classification||"—").replace(" (USDA)",""))}</div>
+      <div class="cls" style="color:${col}">${(r.classification||"—").replace(" (USDA)","")}</div>
       <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>
     </div>
     <div class="detail">
@@ -770,7 +738,7 @@ function table(){
         <dt>Status</dt><dd><span class="tag ${ongoing?"on":"outline"}">${esc(r.status)||"—"}</span> &nbsp;${days}</dd>
         <dt>Distribution</dt><dd>${esc(r.distribution_pattern)||"—"}${r.nationwide==="Yes"?" · Nationwide":""}</dd>
         <dt>Quantity</dt><dd>${esc(r.quantity_raw)||"—"}</dd>
-        ${safeUrl(r.url)?`<dt>Source</dt><dd><a href="${esc(safeUrl(r.url))}" target="_blank" rel="noopener noreferrer">Agency recall page ↗</a></dd>`:""}
+        ${r.url?`<dt>Source</dt><dd><a href="${r.url}" target="_blank" rel="noopener">Agency recall page ↗</a></dd>`:""}
       </dl>${illB}
     </div></div>`;}).join("");
   const remaining=rows.length-shown;
@@ -781,15 +749,9 @@ function table(){
 }
 function policy(){
   $("#policy").innerHTML=POLICY.map(p=>{const conf=(p.effect_on_recalls||"").includes("CONFOUNDER");
-    return `<div class="pol-item"><div class="pol-date">${esc(p.date)}</div><div><div class="pol-title">${esc(p.title)}</div><div class="pol-sum">${esc(p.summary)}</div><div class="pol-eff">${conf?'<span class="tag warn">Confounder</span>':""}<span>${esc((p.effect_on_recalls||"").replace(/^CONFOUNDER:\s*/,""))}</span></div><div class="conf">confidence: ${esc(p.confidence)} · ${esc(p.source)}</div></div></div>`;}).join("");
+    return `<div class="pol-item"><div class="pol-date">${p.date}</div><div><div class="pol-title">${esc(p.title)}</div><div class="pol-sum">${esc(p.summary)}</div><div class="pol-eff">${conf?'<span class="tag warn">Confounder</span>':""}<span>${esc((p.effect_on_recalls||"").replace(/^CONFOUNDER:\s*/,""))}</span></div><div class="conf">confidence: ${esc(p.confidence)} · ${esc(p.source)}</div></div></div>`;}).join("");
 }
-function render(){
-  const none=loaded&&!DATA.length;
-  $("#empty-state").hidden=!none;
-  document.querySelectorAll("#kpis,#filters,.controls,.count,.list").forEach(e=>{e.hidden=none&&!e.classList.contains("controls");});
-  document.querySelectorAll(".wrap > .card:not(.empty-card):not(.policy-card)").forEach(e=>{e.hidden=none;});
-  if(none)return;
-  const rows=filtered();tableRows=rows;shown=PAGE;kpis(rows);trend(rows);regionBars(rows);hazardBars(rows);table();}
+function render(){document.body.classList.toggle("no-data",!DATA.length);const rows=filtered();tableRows=rows;shown=PAGE;kpis(rows);trend(rows);regionBars(rows);hazardBars(rows);table();}
 
 /* ---------- wire up ---------- */
 (function initYears(){const now=new Date().getFullYear();const sel=$("#year");
@@ -798,26 +760,20 @@ function render(){
 $("#f-q").addEventListener("input",render);
 $("#year").addEventListener("change",refresh);
 $("#btn-refresh").addEventListener("click",refresh);
-$("#btn-refresh-empty").addEventListener("click",refresh);
-$("#btn-load-empty").addEventListener("click",()=>$("#file").click());
 $("#btn-filters").addEventListener("click",e=>{const o=$("#filters").classList.toggle("open");e.currentTarget.setAttribute("aria-expanded",o);});
 function toggleRow(t){const row=t.closest(".rowc");const o=row.classList.toggle("open");t.setAttribute("aria-expanded",o);}
 $("#rows").addEventListener("click",e=>{const t=e.target.closest(".rtop");if(t)toggleRow(t);});
 $("#rows").addEventListener("keydown",e=>{const t=e.target.closest(".rtop");if(t&&(e.key==="Enter"||e.key===" ")){e.preventDefault();toggleRow(t);}});
 $("#btn-reset").addEventListener("click",()=>{["f-agency","f-region","f-food","f-hazard","f-class"].forEach(id=>$("#"+id).value="");$("#f-q").value="";render();});
 $("#btn-export").addEventListener("click",()=>{const rows=filtered();const cols=Object.keys(DATA[0]||{recall_id:1});
-  const csv=[cols.join(",")].concat(rows.map(r=>cols.map(c=>{let v=(r[c]??"").toString();if(/^[=+\-@\t\r]/.test(v))v="'"+v;v=v.replace(/"/g,'""');return /[",\n]/.test(v)?`"${v}"`:v;}).join(","))).join("\n");
+  const csv=[cols.join(",")].concat(rows.map(r=>cols.map(c=>{let v=(r[c]??"").toString().replace(/"/g,'""');return /[",\n]/.test(v)?`"${v}"`:v;}).join(","))).join("\n");
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="recalls_filtered.csv";a.click();});
 $("#btn-load").addEventListener("click",()=>$("#file").click());
 $("#file").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();
   rd.onload=()=>{try{let arr=f.name.endsWith(".json")?JSON.parse(rd.result):parseCSV(rd.result);
-    if(!Array.isArray(arr)||!arr.length)throw new Error("the file has no records");
-    const need=["recall_id","agency","classification"];
-    const bad=arr.findIndex(r=>!r||typeof r!=="object"||Array.isArray(r)||need.some(k=>!(k in r)));
-    if(bad>=0)throw new Error("row "+(bad+1)+" is missing required columns ("+need.join(", ")+")");
-    DATA=arr.filter(r=>r.is_sample!=="Yes");loaded=true;
-    banner("info","Loaded "+DATA.length.toLocaleString()+" records from "+esc(f.name)+".");populate();render();}
-    catch(err){banner("error","Could not load that file: "+esc(err.message)+". Your current data was not changed.");}};rd.readAsText(f);});
+    if(!Array.isArray(arr)||!arr.length)throw new Error("empty");DATA=arr;
+    banner();populate();render();alert("Loaded "+arr.length+" records from "+f.name);}
+    catch(err){alert("Could not read that file: "+err.message);}};rd.readAsText(f);});
 function parseCSV(text){const rows=[];let i=0,f="",row=[],q=false;
   while(i<text.length){const c=text[i];
     if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;}
@@ -831,18 +787,18 @@ function parseCSV(text){const rows=[];let i=0,f="",row=[],q=false;
 if(/iP(hone|ad|od)/.test(navigator.userAgent) && !navigator.standalone) $("#a2hs").classList.add("show");
 
 populate(); policy(); drawBarsLegend(); render();
-refresh();   // attempt live data on open; falls back to the snapshot (or an empty state) if blocked
+refresh();   // attempt live data on open; falls back to the last snapshot, else the empty state
 </script>
 </body>
 </html>"""
 
 
 def main():
-    sample = load_sample()
+    snapshot = load_snapshot()
     illness = {r["agent"]: r for r in ref.HAZARD_ILLNESS}
     icon = make_icon()
     html = (TEMPLATE
-            .replace("__SAMPLE_JSON__", json.dumps(sample, ensure_ascii=False))
+            .replace("__SNAPSHOT_JSON__", json.dumps(snapshot, ensure_ascii=False))
             .replace("__POLICY_JSON__", json.dumps(ref.POLICY_TIMELINE, ensure_ascii=False))
             .replace("__ILLNESS_JSON__", json.dumps(illness, ensure_ascii=False))
             .replace("__REGION_OF__", json.dumps(ref.REGION_OF))
@@ -853,7 +809,7 @@ def main():
             .replace("__ICON__", icon))
     with open(OUT, "w", encoding="utf-8") as f:
         f.write(html)
-    print(f"Wrote {OUT}  ({len(sample)} snapshot rows embedded, icon={'yes' if icon else 'no'})")
+    print(f"Wrote {OUT}  ({len(snapshot)} snapshot rows embedded, icon={'yes' if icon else 'no'})")
 
 
 if __name__ == "__main__":

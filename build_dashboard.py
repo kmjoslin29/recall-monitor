@@ -22,12 +22,18 @@ OUT = "dashboard.html"
 
 
 def load():
+    """Load the master data; sample rows are never shown (decision 128).
+    With no data the page builds to an empty state instead of failing."""
     if not os.path.exists(MASTER_JSON):
-        print("Note: data/recalls_master.json not found; building an empty dashboard.\n"
-              "      Run fetch_recalls.py, then build_dashboard.py again.")
+        print("Note: data/recalls_master.json not found; building the empty state. "
+              "Run fetch_recalls.py first for live data.")
         return []
     with open(MASTER_JSON, encoding="utf-8") as f:
-        return [r for r in json.load(f) if os.environ.get("RECALL_INCLUDE_SAMPLE") == "1" or r.get("is_sample") != "Yes"]
+        rows = json.load(f)
+    kept = [r for r in rows if r.get("is_sample") != "Yes"]
+    if len(kept) != len(rows):
+        print(f"Note: dropped {len(rows) - len(kept)} sample rows (fetch_recalls.py --sample is for testing only).")
+    return kept
 
 
 TEMPLATE = r"""<!doctype html>
@@ -64,9 +70,7 @@ TEMPLATE = r"""<!doctype html>
   /* state layers */
   --md-state-hover:.08;--md-state-focus:.10;--md-state-pressed:.10;
   /* motion */
-  --md-ease-standard:cubic-bezier(0.2,0,0,1);
-  /* Expressive "fast spatial" spring approximated with CSS linear() (slight overshoot) */
-  --md-ease-spatial:linear(0,.18 6%,.52 14%,.82 24%,1.02 36%,1.06 44%,1.03 54%,.995 68%,1);--md-dur-short4:200ms;
+  --md-ease-standard:cubic-bezier(0.2,0,0,1);--md-dur-short4:200ms;
   /* type — Roboto is the M3 baseline typeface; system fallbacks keep the
      file offline/self-contained (no webfont download). */
   --md-font:Roboto,"Google Sans Text",system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
@@ -159,16 +163,15 @@ code{font-family:var(--md-font-mono);font-size:.8125rem}
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2370787c' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")}
 .select:hover{border-color:var(--md-on-surface)}
 .select:focus-visible{outline:none;border:2px solid var(--md-primary);padding-left:15px}
-.search{display:flex;align-items:center;gap:8px;height:56px;padding:0 16px;
-  border:1px solid var(--md-outline);border-radius:var(--md-shape-xs);background:var(--md-surface);
+.search{display:flex;align-items:center;gap:4px;height:56px;padding:0 16px 0 16px;
+  border-radius:var(--md-shape-full);background:var(--md-surface-container-high);
   color:var(--md-on-surface-variant)}
-.search:hover{border-color:var(--md-on-surface)}
 .search svg{width:24px;height:24px;fill:currentColor;flex:0 0 auto}
 .search input{flex:1;min-width:0;height:100%;border:0;background:transparent;
-  font:inherit;font-size:1rem;line-height:1.5rem;color:var(--md-on-surface);padding:0}
+  font:inherit;font-size:1rem;line-height:1.5rem;color:var(--md-on-surface);padding:0 8px}
 .search input::placeholder{color:var(--md-on-surface-variant)}
 .search input:focus-visible{outline:none}
-.search:focus-within{border:2px solid var(--md-primary);padding:0 15px}
+.search:focus-within{outline:3px solid var(--md-secondary);outline-offset:2px}
 
 /* ===== cards (outlined: medium corner, 1px outline-variant) =============== */
 .card{background:var(--md-surface);border:1px solid var(--md-outline-variant);
@@ -189,13 +192,18 @@ code{font-family:var(--md-font-mono);font-size:.8125rem}
 .tag.outline{border:1px solid var(--md-outline-variant);color:var(--md-on-surface-variant)}
 .tag.on{background:var(--warn-container);color:var(--on-warn-container)}
 .tag.live{background:var(--md-primary-container);color:var(--md-on-primary-container)}
-.tag.sample{background:var(--md-error-container);color:var(--md-on-error-container)}
 
 /* notice (filled card in error/secondary containers; M3 has no banner) */
 .notice{border-radius:var(--md-shape-md);padding:12px 16px;font-size:.875rem;line-height:1.25rem}
 .notice.error{background:var(--md-error-container);color:var(--md-on-error-container)}
 .notice.warn{background:var(--warn-container);color:var(--on-warn-container)}
 .notice.info{background:var(--md-secondary-container);color:var(--md-on-secondary-container)}
+
+/* empty state (decision 128): with no data, only the empty state and one primary action show */
+.empty-state{display:none;padding:48px 16px;text-align:center}
+.empty-state p{margin:0 0 16px;color:var(--md-on-surface-variant)}
+.no-data .data-only{display:none!important}
+.no-data .empty-state{display:block}
 
 /* ===== data viz =========================================================== */
 .legend{display:flex;gap:4px 16px;flex-wrap:wrap;font-size:.75rem;line-height:1rem;
@@ -214,16 +222,12 @@ code{font-family:var(--md-font-mono);font-size:.8125rem}
   color:var(--md-on-surface-variant)}
 .trend-scroll-wrap{display:flex;align-items:flex-start}
 .trend-axis{flex:0 0 auto}
-.trend-scroll:focus-visible{outline:3px solid var(--md-secondary);outline-offset:2px}
 .trend-scroll{overflow-x:auto;overflow-y:hidden;flex:1 1 auto;min-width:0;
   -webkit-overflow-scrolling:touch;scrollbar-width:thin}
 .trend-scroll svg{display:block}
 svg text{font-family:var(--md-font);font-size:11px;fill:var(--md-on-surface-variant);
   font-variant-numeric:tabular-nums}
 .axis{stroke:var(--md-outline-variant)}
-[hidden]{display:none!important}
-.empty-card{padding:32px 24px;text-align:center;margin:8px 0 24px}
-.empty-card p{margin:0 auto 16px;max-width:52ch;color:var(--md-on-surface-variant)}
 .empty{padding:40px 16px;text-align:center;color:var(--md-on-surface-variant)}
 
 /* ===== expandable list ==================================================== */
@@ -239,7 +243,7 @@ svg text{font-family:var(--md-font);font-size:11px;fill:var(--md-on-surface-vari
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cls{font-size:.75rem;line-height:1rem;font-weight:500;letter-spacing:.03125rem;white-space:nowrap}
 .chev{width:24px;height:24px;fill:var(--md-on-surface-variant);flex:0 0 auto;
-  transition:transform 350ms var(--md-ease-spatial)}
+  transition:transform var(--md-dur-short4) var(--md-ease-standard)}
 .row.open .chev{transform:rotate(180deg)}
 .detail{display:none;padding:8px 16px 16px 36px;background:var(--md-surface-container-low)}
 .row.open .detail{display:block}
@@ -270,12 +274,7 @@ footer{margin-top:32px;padding-top:16px;border-top:1px solid var(--md-outline-va
 footer ul{margin:8px 0 0;padding-left:20px}
 footer strong{color:var(--md-on-surface)}
 
-/* Decision 18: reduced motion keeps opacity/color changes, drops movement */
-@media (prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}
-  .chev{transition:none!important}
-  *{animation:none!important}
-}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
 
 /* ===== desktop layout (M3 window size classes) ============================ */
 .wrap{max-width:1280px;margin:0 auto;padding:0 24px 48px}          /* medium+ : 24dp */
@@ -320,7 +319,6 @@ h1{margin:0;color:var(--md-on-surface)}
   .rtop .mid{grid-area:m}.rtop .cls{grid-area:c}.rtop .chev{grid-area:v}
 }
 @media (min-width:840px){.rtop .meta-sm{display:none}}
-@media (min-width:1600px){.wrap{max-width:1560px}}      /* extra-large: wider canvas; margins unverified in log, kept 24dp */
 @media (max-width:599px){                                             /* compact: 16dp margins */
   .wrap{padding:0 16px 48px}
   .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
@@ -344,22 +342,22 @@ h1{margin:0;color:var(--md-on-surface)}
     </div>
   </header>
 
-  <div id="status-msg" role="status" hidden></div>
-  <section class="empty-card card" id="empty-state" hidden>
+  <section class="card empty-state" id="empty-state">
     <h2>No recall data loaded</h2>
-    <p>This dashboard has no records yet. Run <code>fetch_recalls.py</code> and rebuild, or load a recalls file you already have.</p>
+    <p>Run <code>fetch_recalls.py</code> then <code>build_dashboard.py</code>, or open a recalls JSON or CSV file.</p>
     <button type="button" class="btn filled sl" id="btn-load-empty">Load data file</button>
   </section>
-  <section class="kpis" id="kpis" aria-label="Summary"></section>
 
-  <section class="controls" id="controls-sec" aria-label="Filters">
+  <section class="kpis data-only" id="kpis" aria-label="Summary"></section>
+
+  <section class="controls data-only" aria-label="Filters">
     <div class="fld"><label for="f-agency">Agency</label><select class="select" id="f-agency"></select></div>
     <div class="fld"><label for="f-region">Region</label><select class="select" id="f-region"></select></div>
     <div class="fld"><label for="f-food">Food type</label><select class="select" id="f-food"></select></div>
     <div class="fld"><label for="f-hazard">Hazard</label><select class="select" id="f-hazard"></select></div>
     <div class="fld"><label for="f-class">Class</label><select class="select" id="f-class"></select></div>
-    <div class="search-fld fld"><label for="f-q">Search</label><div class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-      <input type="search" id="f-q" placeholder="Firm, product, reason, or pathogen"></div></div>
+    <div class="search-fld"><div class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <input type="search" id="f-q" placeholder="Search firm, product, reason, or pathogen" aria-label="Search firm, product, reason, or pathogen"></div></div>
     <div class="actions">
       <span class="spacer"></span>
       <button type="button" class="btn text sl" id="btn-reset">Reset filters</button>
@@ -369,7 +367,7 @@ h1{margin:0;color:var(--md-on-surface)}
     </div>
   </section>
 
-  <div class="grid" id="main-grid">
+  <div class="grid data-only">
     <section class="card">
       <h2>Recalls per month<span class="sub">Stacked by severity class &middot; dashed lines mark policy events</span></h2>
       <div id="trend"></div>
@@ -384,8 +382,8 @@ h1{margin:0;color:var(--md-on-surface)}
     </section>
   </div>
 
-  <div class="count" id="count" aria-live="polite"></div>
-  <section class="list" id="list-sec" aria-label="Recalls">
+  <div class="count data-only" id="count" aria-live="polite"></div>
+  <section class="list data-only" aria-label="Recalls">
     <div class="list-head tbl-head">
       <span></span>
       <button type="button" class="sl" data-sort="agency">Agency</button>
@@ -400,7 +398,7 @@ h1{margin:0;color:var(--md-on-surface)}
     <div class="listfoot" id="tablefoot"></div>
   </section>
 
-  <section class="card policy">
+  <section class="card policy data-only">
     <h2>Policy &amp; regulatory timeline<span class="sub">Items tagged <b>confounder</b> can change reported counts independent of actual food safety</span></h2>
     <div id="policy"></div>
   </section>
@@ -428,7 +426,7 @@ h1{margin:0;color:var(--md-on-surface)}
 const RECALLS = __RECALLS_JSON__;
 const POLICY  = __POLICY_JSON__;
 const ILLNESS = __ILLNESS_JSON__;
-let DATA = RECALLS.slice();
+let DATA = RECALLS.slice();   // never contains sample rows (filtered at build time)
 
 const CLASS_ORDER = ["Class I","Class II","Class III","Public Health Alert (USDA)"];
 const CLASS_COLOR = {"Class I":"var(--sev-c1)","Class II":"var(--sev-c2)",
@@ -442,7 +440,7 @@ const PAGE=50; let shown=PAGE, tableRows=[];
 
 function opts(sel, values, all="All"){
   sel.innerHTML = `<option value="">${all}</option>` +
-    values.map(v=>`<option>${esc(v)}</option>`).join("");
+    values.map(v=>`<option>${v}</option>`).join("");
 }
 function populate(){
   opts($("#f-agency"), uniq(DATA.map(r=>r.agency)).sort());
@@ -491,7 +489,7 @@ function kpis(rows){
     ["",top?top[0].replace(" (pathogen)",""):"—","Top hazard"],
   ];
   $("#kpis").innerHTML = cards.map(([c,n,l])=>
-    `<div class="card kpi ${c}"><div class="n" title="${esc(n)}">${esc(n)}</div><div class="l">${l}</div></div>`).join("");
+    `<div class="card kpi ${c}"><div class="n" title="${n}">${n}</div><div class="l">${l}</div></div>`).join("");
   $("#st-count").textContent = DATA.length;
 }
 
@@ -532,7 +530,7 @@ function trend(rows){
     if(yr!==lastYear){                           // year separator + label
       const lx=x(i)-colW/2;
       years+=`<line x1="${lx}" x2="${lx}" y1="${padT}" y2="${padT+plotH+6}" style="stroke:var(--md-outline)"/>`
-        +`<text x="${lx+4}" y="${H-padB+32}" text-anchor="start" style="fill:var(--md-on-surface);font-weight:600">${esc(yr)}</text>`;
+        +`<text x="${lx+4}" y="${H-padB+32}" text-anchor="start" style="fill:var(--md-on-surface)" style="font-weight:600">${yr}</text>`;
       lastYear=yr;
     }
     let acc=0;
@@ -540,10 +538,10 @@ function trend(rows){
       const v=c[cls]; if(!v) return;
       const h=plotH*v/maxV, yy=padT+plotH*(1-(acc+v)/maxV);
       bars+=`<rect x="${x(i)-bw/2}" y="${yy}" width="${bw}" height="${h}"
-        style="fill:${CLASS_COLOR[cls]}"><title>${esc(c.m)} · ${esc(cls)}: ${v}</title></rect>`;
+        style="fill:${CLASS_COLOR[cls]}"><title>${c.m} · ${cls}: ${v}</title></rect>`;
       acc+=v;
     });
-    bars+=`<text x="${x(i)}" y="${H-padB+14}" text-anchor="middle">${esc(c.m.slice(5))}</text>`;
+    bars+=`<text x="${x(i)}" y="${H-padB+14}" text-anchor="middle">${c.m.slice(5)}</text>`;
     if(c.total) bars+=`<text x="${x(i)}" y="${y(c.total)-4}" text-anchor="middle" style="fill:var(--md-on-surface)">${c.total}</text>`;
   });
   let marks="";
@@ -553,11 +551,11 @@ function trend(rows){
       marks+=`<line x1="${xx}" x2="${xx}" y1="${padT}" y2="${padT+plotH}"
         style="stroke:var(--md-on-surface)" stroke-dasharray="3 3" opacity=".5"/>
         <polygon class="pol-marker" points="${xx-4},${padT} ${xx+4},${padT} ${xx},${padT+7}"
-        style="fill:var(--md-on-surface)"><title>${esc(p.date)} — ${esc(p.title)}</title></polygon>`;}
+        style="fill:var(--md-on-surface)"><title>${p.date} — ${p.title}</title></polygon>`;}
   });
   host.innerHTML=`<div class="trend-scroll-wrap">`
     +`<svg class="trend-axis" width="${AX}" height="${H}" aria-hidden="true">${axis}</svg>`
-    +`<div class="trend-scroll" tabindex="0" role="region" aria-label="Recalls per month chart, scrollable"><svg width="${W}" height="${H}" role="img"`
+    +`<div class="trend-scroll"><svg width="${W}" height="${H}" role="img"`
     +` aria-label="Recalls per month by class">${grid}${years}${bars}${marks}</svg></div></div>`;
   $("#trend-legend").innerHTML = CLASS_ORDER.map(c=>
     `<span><i style="background:${CLASS_COLOR[c]}"></i>${c}</span>`).join("")
@@ -569,7 +567,7 @@ function stackedBars(host, entries, max){
   host.innerHTML = entries.map(e=>{
     const segs = CLASS_ORDER.map(c=>{const v=e.seg[c]||0;
       return v?`<i style="width:${100*v/e.total}%;background:${CLASS_COLOR[c]}" title="${c}: ${v}"></i>`:"";}).join("");
-    return `<div class="bar-row"><div class="name" title="${esc(e.name)}">${esc(e.name)}</div>`
+    return `<div class="bar-row"><div class="name" title="${e.name}">${e.name}</div>`
       +`<div class="bar-track"><div class="stack" style="width:${100*e.total/max}%">${segs}</div></div>`
       +`<div class="v">${e.total}</div></div>`;
   }).join("") || '<div class="empty" style="padding:14px">None</div>';
@@ -595,14 +593,13 @@ function illnessFor(r){
     (r.hazard_category==="Undeclared allergen" ? ILLNESS["Undeclared allergen"] : null) ||
     (r.hazard_category==="Foreign material" ? ILLNESS["Foreign material"] : null);
 }
-function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function safeUrl(u){try{const x=new URL(String(u||""));return x.protocol==="https:"?x.href:"";}catch(e){return "";}}
+function esc(s){return (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));}
 
 function table(){
   const rows=tableRows, host=$("#rows");
   $("#count").textContent = rows.length ?
     `Showing ${Math.min(shown,rows.length).toLocaleString()} of ${rows.length.toLocaleString()} recalls` : "";
-  if(!rows.length){host.innerHTML='<div class="empty">No recalls match these filters. Try clearing a filter.</div>';
+  if(!rows.length){host.innerHTML='<div class="empty">No recalls match these filters.</div>';
     $("#tablefoot").innerHTML=""; $("#count").textContent="0 recalls"; return;}
   const slice=rows.slice(0,shown);
   host.innerHTML = slice.map((r,i)=>{
@@ -611,7 +608,7 @@ function table(){
     const ill=illnessFor(r);
     const ongoing=/ongoing|active|open|progress/i.test(r.status);
     const daysTxt = r.days_open!==""&&r.days_open!=null ?
-      `${esc(r.days_open)} days${r.date_closed?"":" (open)"}` : "—";
+      `${r.days_open} days${r.date_closed?"":" (open)"}` : "—";
     const illBlock = ill ? `<div class="illness">
         <div class="h">If ${esc(r.agent||r.hazard_category)} — what it can cause</div>
         <b>${esc(ill.illness)}.</b> ${esc(ill.symptoms)}
@@ -621,14 +618,14 @@ function table(){
       <div class="rtop sl" tabindex="0" role="button" aria-expanded="false"
            aria-label="${esc(r.firm)} — ${esc(r.classification||"")} — show details">
         <div class="spine" style="background:${col}"></div>
-        <div class="ag"><span class="tag ${agc}">${esc(r.agency)}</span></div>
-        <div class="dt">${esc(r.date_reported)||"—"}</div>
+        <div class="ag"><span class="tag ${agc}">${r.agency}</span></div>
+        <div class="dt">${r.date_reported||"—"}</div>
         <div class="mid" style="min-width:0">
           <div class="firm" title="${esc(r.firm)}">${esc(r.firm)||"—"}</div>
-          <div class="prod meta-sm">${esc(r.agency)} · ${esc(r.date_reported)||"—"} · ${esc(r.regions)}</div>
+          <div class="prod meta-sm">${r.agency} · ${r.date_reported||"—"} · ${esc(r.regions)}</div>
         </div>
         <div class="prod pr" title="${esc(r.product_description)}">${esc(r.product_description)}</div>
-        <div class="cls" style="color:${col}">${esc((r.classification||"—").replace(" (USDA)",""))}</div>
+        <div class="cls" style="color:${col}">${(r.classification||"—").replace(" (USDA)","")}</div>
         <div class="reg" title="${esc(r.regions)}">${esc(r.regions)}</div>
         <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>
       </div>
@@ -643,7 +640,7 @@ function table(){
             ${r.nationwide==="Yes"?" · Nationwide":""}</dd>
           <dt>Quantity</dt><dd>${esc(r.quantity_raw)||"—"}</dd>
           <dt>Firm location</dt><dd>${esc([r.firm_city,r.firm_state].filter(Boolean).join(", "))||"—"}</dd>
-          ${safeUrl(r.url)?`<dt>Source</dt><dd><a href="${esc(safeUrl(r.url))}" target="_blank" rel="noopener noreferrer">Agency recall page ↗</a></dd>`:""}
+          ${r.url?`<dt>Source</dt><dd><a href="${r.url}" target="_blank" rel="noopener">Agency recall page ↗</a></dd>`:""}
         </dl>
         ${illBlock}
       </div></div>`;
@@ -669,7 +666,7 @@ function policy(){
   $("#policy").innerHTML = POLICY.map(p=>{
     const conf=(p.effect_on_recalls||"").includes("CONFOUNDER");
     return `<div class="pol-item">
-      <div class="pol-date">${esc(p.date)}</div>
+      <div class="pol-date">${p.date}</div>
       <div><div class="pol-title">${esc(p.title)}</div>
       <div class="pol-sum">${esc(p.summary)}</div>
       <div class="pol-eff">${conf?'<span class="tag warn">Confounder</span>':""}<span>${esc((p.effect_on_recalls||"").replace(/^CONFOUNDER:\s*/,""))}</span></div>
@@ -678,10 +675,7 @@ function policy(){
 }
 
 function render(){
-  const none=!DATA.length;
-  $("#empty-state").hidden=!none;
-  ["kpis","controls-sec","main-grid","list-sec","count"].forEach(id=>{document.getElementById(id).hidden=none;});
-  if(none){ $("#st-count").textContent="0"; return; }
+  document.body.classList.toggle("no-data", !DATA.length);
   const rows=filtered();
   tableRows=rows; shown=PAGE;
   kpis(rows); trend(rows); regionBars(rows); hazardBars(rows); table();
@@ -709,9 +703,7 @@ $("#btn-export").addEventListener("click",()=>{
   const rows=filtered();
   const cols=Object.keys(RECALLS[0]||{recall_id:1});
   const csv=[cols.join(",")].concat(rows.map(r=>cols.map(c=>{
-    let v=(r[c]??"").toString();
-    if(/^[=+\-@\t\r]/.test(v)) v="'"+v;          // X12: neutralize spreadsheet formulas
-    v=v.replace(/"/g,'""');
+    let v=(r[c]??"").toString().replace(/"/g,'""');
     return /[",\n]/.test(v)?`"${v}"`:v;
   }).join(","))).join("\n");
   const a=document.createElement("a");
@@ -729,20 +721,13 @@ $("#file").addEventListener("change",e=>{
       let arr;
       if(f.name.endsWith(".json")) arr=JSON.parse(rd.result);
       else arr=parseCSV(rd.result);
-      if(!Array.isArray(arr)||!arr.length) throw new Error("the file has no records");
-      const need=["recall_id","agency","classification"];
-      const bad=arr.findIndex(r=>!r||typeof r!=="object"||Array.isArray(r)||need.some(k=>!(k in r)));
-      if(bad>=0) throw new Error("row "+(bad+1)+" is missing required columns ("+need.join(", ")+")");
-      DATA=arr.filter(r=>r.is_sample!=="Yes"); populate(); render();
-      announce("Loaded "+DATA.length.toLocaleString()+" records from "+f.name+".");
-    }catch(err){announce("Could not load that file: "+err.message+". Your current data was not changed.",true);}
+      if(!Array.isArray(arr)||!arr.length) throw new Error("empty");
+      DATA=arr; populate(); render();
+      alert("Loaded "+arr.length+" records from "+f.name);
+    }catch(err){alert("Could not read that file: "+err.message);}
   };
   rd.readAsText(f);
 });
-function announce(msg,isErr){
-  const el=$("#status-msg"); el.textContent=msg; el.className="notice "+(isErr?"error":"info");
-  el.hidden=false;
-}
 function parseCSV(text){
   const rows=[]; let i=0,f="",row=[],q=false;
   while(i<text.length){const c=text[i];
